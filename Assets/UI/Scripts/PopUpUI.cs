@@ -97,6 +97,14 @@ public class PopUpUI : MonoBehaviour
         }
     }
 
+    public void TurnOnMailIcon()
+    {
+        if(m_UI.gameObject.activeSelf == false)
+        {
+            m_UI.SetActive(true);
+        }
+    }
+
     // 지정 팝업창을 켜 주면서 그 전의 UI 는 꺼준다.
     public void PopUpMyUI()
     {

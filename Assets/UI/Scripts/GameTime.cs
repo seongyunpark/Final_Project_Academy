@@ -5,6 +5,14 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 
+public struct NowTime
+{
+    public int NowYear;
+    public string NowMonth;
+    public string NowWeek;
+    public string NowDay;
+}
+
 /// <summary>
 ///  
 /// </summary>
@@ -23,7 +31,10 @@ public class GameTime : MonoBehaviour
     }
 
     public TextMeshProUGUI m_DrawnowTime;
-    public string nowTime;
+    public TextMeshProUGUI m_TimeText;
+
+
+    public NowTime FlowTime;
 
     const float LimitTime1 = 5.0f;      // 1 ~ 2주 제한시간
     const float LimitTime2 = 30.0f;     // 3 ~ 4주 제한시간
@@ -43,6 +54,7 @@ public class GameTime : MonoBehaviour
 
     public int MonthIndex = 2;
     public int WeekIndex = 0;
+    public int DayIndex = 0;
 
     int FirstHalfPerSecond = 1;       //  (1주 - 2주) 하루의 시간 1초(한 주 총 5초)
     int SecondHalfPerSecond = 6;      // (3주 - 4주)하루의 시간은 6초                                       // 
@@ -79,22 +91,25 @@ public class GameTime : MonoBehaviour
         // Week[0] = "첫째주";
         m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
 
-        nowTime = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
+        FlowTime.NowYear = Year;
+        FlowTime.NowMonth = Month[MonthIndex];
+        FlowTime.NowWeek = Week[WeekIndex];
+        FlowTime.NowDay = Day[DayIndex];
 
         Debug.Log(Year + "년" + " " + Month[MonthIndex] + " " + Week[WeekIndex]);
+
+        ShowGameTime();
     }
 
     bool call = false;
     // Update is called once per frame
     public void Update()
     {
-
         if (IsGameMode == true)
         {
+            FlowtheTime();
 
             ShowGameTime();
-
-            FlowtheTime();
         }
 
         //if (Input.GetKeyDown(KeyCode.A))
@@ -120,9 +135,12 @@ public class GameTime : MonoBehaviour
             // nowTime = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
             m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
 
+            FlowTime.NowYear = Year;
+            FlowTime.NowMonth = Month[MonthIndex];
+            FlowTime.NowWeek = Week[WeekIndex];
+
             // m_DrawnowTime.text = nowTime;
 
-            Debug.Log(nowTime);
 
             // 3년이라는 게임 시간이 끝나고 난 후
             if (Year == 3 && MonthIndex == 11 && WeekIndex == 3)
@@ -145,7 +163,19 @@ public class GameTime : MonoBehaviour
         CheckPerSecond();
     }
 
-    // 년 주 증가
+    public void ChangeDay()
+    {
+        if(DayIndex != 4)
+        {
+            DayIndex++;
+        }
+        else if(DayIndex == 4)
+        {
+            DayIndex = 0;
+        }
+    }
+
+    // 주 증가
     public void ChangeWeek()
     {
         // Week 증가
@@ -174,6 +204,7 @@ public class GameTime : MonoBehaviour
         }
     }
 
+    // 년 증가
     public void ChangeYear()
     {
         // Year 증가
@@ -196,6 +227,9 @@ public class GameTime : MonoBehaviour
                     TimeBarImg.fillAmount += 0.2f;
 
                     // 1초마다 더해주기
+                    ChangeDay();
+                    FlowTime.NowDay = Day[DayIndex];
+
                     i += 1;
                     FirstHalfPerSecond += 1;
 
@@ -226,6 +260,9 @@ public class GameTime : MonoBehaviour
 
                     i += 1;
                     // 6초마다 더해주기
+                    ChangeDay();
+                    FlowTime.NowDay = Day[DayIndex];
+
                     SecondHalfPerSecond += 6;
 
                     if (SecondHalfPerSecond > LimitTime2)
@@ -266,7 +303,6 @@ public class GameTime : MonoBehaviour
 
     public void ShowGameTime()
     {
-        //Debug.Log("시간 진행 : " + IsGameMode);
-
+        m_TimeText.text = FlowTime.NowYear.ToString() + FlowTime.NowMonth + FlowTime.NowWeek + FlowTime.NowDay;
     }
 }

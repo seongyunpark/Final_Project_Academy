@@ -14,7 +14,7 @@ public class SaveEventClassData
     public string EventClassName;                           // 이벤트 이름
     public string EventInformation;                         // 이벤트 설명 내용
 
-    public const int RewardStatCount = 6;
+    public const int RewardStatCount = 6;                   // 보상스탯의 갯수는 6개
 
     public string[] EventRewardStatName = new string[RewardStatCount];    // 보상 - 스탯이름
     public float[] EventRewardStat = new float[RewardStatCount];          // 보상 - 스탯수치
@@ -30,8 +30,10 @@ public class SaveEventClassData
 /// Mang 2023. 01. 05
 /// 
 /// 이 클래스는 이벤트가 담길 프리팹을 생성해주는 클래스
-/// 일시적으로 보일 이벤트프리팹이므로 여기에 EventSchedule 클래스(싱글턴) 의 나의 이벤트 목록에 
-/// 데이터들을 담아주도록 하자
+/// 
+/// 일시적으로 보일 이벤트프리팹이므로 여기서 에빈트 관련 업무를 다 보도록 하자
+/// 
+/// 
 /// </summary>
 
 public class EventClassPrefab : MonoBehaviour
@@ -56,6 +58,21 @@ public class EventClassPrefab : MonoBehaviour
     {
         // 1. 제이슨 파일 전체 이벤트리스트 변수에 담기
 
+        // 고정이벤트
+        for (int i = 0; i < 3; i++)
+        {
+
+            SaveEventClassData TempFixedData = new SaveEventClassData();
+            TempFixedData.EventClassName = "Fixed" + i;
+            TempFixedData.EventDay[0] = "1";
+            TempFixedData.EventDay[1] = "1월";
+            TempFixedData.EventDay[2] = "셋째 주";
+            TempFixedData.EventDay[3] = "화요일";
+
+
+        }
+
+        // 선택이벤트
         // (임시로 여기서)2. 전체 이벤트 리스트에서 사용가능한 이벤트들 사용가능이벤트 리스트 변수에 담기
         for (int i = 0; i < 5; i++)
         {
@@ -72,15 +89,15 @@ public class EventClassPrefab : MonoBehaviour
             //     }
             // }
             TempEventData.EventRewardStatName[0] = "StatName0";
-            TempEventData.EventRewardStat[0] = 5;
+            TempEventData.EventRewardStat[0] = 5 + (i * 3);
 
             TempEventData.EventRewardStatName[1] = "StatName1";
-            TempEventData.EventRewardStat[1] = 30;
+            TempEventData.EventRewardStat[1] = 30 + (i * 7);
 
             TempEventData.EventRewardStatName[2] = "StatName2";
-            TempEventData.EventRewardStat[2] = 100;
+            TempEventData.EventRewardStat[2] = 100 + (i * 2);
 
-            TempEventData.EventRewardMoney = 5247;
+            TempEventData.EventRewardMoney = 5247 + (i * 4);
 
             PossibleChooseEventClassList.Add(TempEventData);
         }
@@ -103,16 +120,10 @@ public class EventClassPrefab : MonoBehaviour
 
     }
 
-    public void PutEventInPossibleList()
-    {
-
-    }
-
-
     // 버튼 눌렸을 때 이벤트버튼 목록들을 동적으로 생성해 줄 함수
     public void MakeEventClass()
     {
-        RewardInfoBG.SetActive(false);
+        RewardInfoBG.SetActive(true);
 
         // 2. 전체 이벤트 리스트에서 사용가능한 이벤트들 사용가능이벤트 리스트 변수에 담기
 
@@ -173,6 +184,7 @@ public class EventClassPrefab : MonoBehaviour
         {
             if (_NowEvent.name == possibleEvent.EventClassName)
             {
+                // 이벤트 이름 , 설명
                 _EventDataObj.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = possibleEvent.EventClassName;      // 이벤트 이름
                 _EventDataObj.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = possibleEvent.EventInformation;      // 이벤트 설명
 
@@ -211,6 +223,10 @@ public class EventClassPrefab : MonoBehaviour
 
                 // 여기서 임시로 내가 선택한 데이터를 담아둔다
                 IfIChoosedEvent = possibleEvent;
+                EventSchedule.Instance.tempEventList = possibleEvent;
+
+                Debug.Log(IfIChoosedEvent.EventClassName);
+
             }
         }
 
@@ -221,10 +237,43 @@ public class EventClassPrefab : MonoBehaviour
         }
     }
 
-    public void SaveMyEventChoice()
+    // 이벤트 선택 후 달력창에서 보일 선택한 이벤트 설명 창
+    public void SelectedEventScreen()
     {
-        EventSchedule.Instance.MyEventList.Add(IfIChoosedEvent);
+        GameObject _EventDataObj = GameObject.Find("CalenderRewardInfo");
 
-        Debug.Log("데이터 저장");
+        // 현재 월
+        _EventDataObj.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = GameTime.Instance.FlowTime.NowMonth;
+
+        // 이벤트 이름
+        _EventDataObj.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = IfIChoosedEvent.EventClassName;
+        // 이벤트 설명
+        _EventDataObj.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = IfIChoosedEvent.EventInformation;
+
+        // 이벤트 보상
+        int BoxArrow = 0;
+        // 머니
+        if (IfIChoosedEvent.EventRewardMoney != 0)
+        {
+            _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = "머니";
+            _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = IfIChoosedEvent.EventRewardMoney.ToString();
+            BoxArrow += 1;
+        }
+
+        // 스탯
+        for (int i = 0; i < SaveEventClassData.RewardStatCount; i++)
+        {
+            if (IfIChoosedEvent.EventRewardStat[i] != 0)
+            {
+                _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = IfIChoosedEvent.EventRewardStatName[i];
+                _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = IfIChoosedEvent.EventRewardStat[i].ToString();
+                BoxArrow += 1;
+            }
+            else
+            {
+                _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).gameObject.SetActive(false);
+                BoxArrow += 1;
+            }
+        }
     }
 }

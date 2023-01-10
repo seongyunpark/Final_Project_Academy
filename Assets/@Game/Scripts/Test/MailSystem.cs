@@ -17,7 +17,12 @@ public class MailSystem : MonoBehaviour
 
     void Update()
     {
-        if(GameTime.Instance.WeekIndex == 2 && m_IsTurnOnIcon == false)
+        if(m_IsTurnOnIcon == true && GameTime.Instance.isChangeWeek == true)
+        {
+            m_IsTurnOnIcon = false;
+        }
+
+        if((GameTime.Instance.WeekIndex == 1 || GameTime.Instance.WeekIndex == 2) && m_IsTurnOnIcon == false)
         {
             SatisfyRequirement();
         }

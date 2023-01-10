@@ -11,6 +11,7 @@ public class SaveEventClassData
 {
     public string[] EventDay = new string[4];               // 이벤트가 실행될 날짜 배열( 년, 월, 주, 요일)
     public string EventKeyward;                             // 고정인지 선택인지 구별할 스트링
+    public int EventNumber;
     public string EventClassName;                           // 이벤트 이름
     public string EventInformation;                         // 이벤트 설명 내용
 
@@ -39,8 +40,8 @@ public class SaveEventClassData
 public class EventClassPrefab : MonoBehaviour
 {
     // Inspector 창에 연결해줄 변수들
-    public GameObject m_prefab;
-    public Transform m_Parent;
+    public GameObject m_prefab;     // 
+    public Transform m_Parent;      // 
     public GameObject m_SelectedEventInfo;
 
     public GameObject RewardInfoBG;
@@ -49,28 +50,42 @@ public class EventClassPrefab : MonoBehaviour
     // 이 변수들도 EventSchedule 의 Instance.변수 들에 넣어주고 쓰도록 하자
     public List<SaveEventClassData> SelectEventClassInfo = new List<SaveEventClassData>();      // 전체 선택 이벤트
     public List<SaveEventClassData> FixedEventClassInfo = new List<SaveEventClassData>();       // 전체 고정 이벤트
-    public List<SaveEventClassData> PossibleChooseEventClassList = new List<SaveEventClassData>();      //  사용가능한 이벤트 목록
+
+    public List<SaveEventClassData> PossibleChooseEventClassList = new List<SaveEventClassData>();      //  사용가능한 선택이벤트 목록
 
     public SaveEventClassData IfIChoosedEvent;           // 현재 선택한 이벤트 담아 줄 임시 변수
+
+    string month;
 
     // Start is called before the first frame update
     void Start()
     {
+        month = GameTime.Instance.FlowTime.NowMonth;
         // 1. 제이슨 파일 전체 이벤트리스트 변수에 담기
 
         // 고정이벤트
-        for (int i = 0; i < 3; i++)
-        {
+        SaveEventClassData TempFixedData = new SaveEventClassData();
+        TempFixedData.EventClassName = "Fixed";
+        TempFixedData.EventDay[0] = "1";
+        TempFixedData.EventDay[1] = GameTime.Instance.Month[2];
+        TempFixedData.EventDay[2] = GameTime.Instance.Week[1];
+        TempFixedData.EventDay[3] = GameTime.Instance.Day[3];
 
-            SaveEventClassData TempFixedData = new SaveEventClassData();
-            TempFixedData.EventClassName = "Fixed" + i;
-            TempFixedData.EventDay[0] = "1";
-            TempFixedData.EventDay[1] = "1월";
-            TempFixedData.EventDay[2] = "셋째 주";
-            TempFixedData.EventDay[3] = "화요일";
+        TempFixedData.EventInformation = "이벤트설명";
+        TempFixedData.EventKeyward = "Fixed";
 
+        TempFixedData.EventRewardStatName[0] = "StatName0";
+        TempFixedData.EventRewardStat[0] = 2 + (1 * 3);
 
-        }
+        TempFixedData.EventRewardStatName[1] = "StatName1";
+        TempFixedData.EventRewardStat[1] = 8 + (3 * 7);
+
+        TempFixedData.EventRewardStatName[2] = "StatName2";
+        TempFixedData.EventRewardStat[2] = 46 + (2 * 2);
+
+        TempFixedData.EventRewardMoney = 386 + (1 * 4);
+
+        FixedEventClassInfo.Add(TempFixedData);
 
         // 선택이벤트
         // (임시로 여기서)2. 전체 이벤트 리스트에서 사용가능한 이벤트들 사용가능이벤트 리스트 변수에 담기
@@ -88,6 +103,7 @@ public class EventClassPrefab : MonoBehaviour
             //     {
             //     }
             // }
+            TempEventData.EventKeyward = "Select";      // 고정이벤트인지 선택이벤트인지 구별할 키워드
             TempEventData.EventRewardStatName[0] = "StatName0";
             TempEventData.EventRewardStat[0] = 5 + (i * 3);
 
@@ -111,13 +127,19 @@ public class EventClassPrefab : MonoBehaviour
         // {
         //     PossibleChooseEventClassList.
         // }
-
+        FixedEventLoadList(month);
     }
 
     // Update is called once per frame
     void Update()
     {
+        // 달이 바뀔 때마다 이전과 현재 비교 후 그 달의 고정 이벤트 정보를 받겠지
+        if(month != GameTime.Instance.FlowTime.NowMonth)
+        {
+            month = GameTime.Instance.FlowTime.NowMonth;
 
+            FixedEventLoadList(month);
+        }
     }
 
     // 버튼 눌렸을 때 이벤트버튼 목록들을 동적으로 생성해 줄 함수
@@ -273,6 +295,22 @@ public class EventClassPrefab : MonoBehaviour
             {
                 _EventDataObj.transform.GetChild(4).GetChild(BoxArrow).gameObject.SetActive(false);
                 BoxArrow += 1;
+            }
+        }
+    }
+
+    // 월 비교하면서 고정 이벤트를 현재 나의 이벤트 목록에 넣어주기 위한 함수
+    public void FixedEventLoadList(string month)
+    {
+        for (int i = 0; i < FixedEventClassInfo.Count; i++)
+        {
+            if (month == FixedEventClassInfo[i].EventDay[1])
+            {
+                SaveEventClassData tempFixed = new SaveEventClassData();
+
+                tempFixed = FixedEventClassInfo[i];
+
+                EventSchedule.Instance.MyEventList.Add(tempFixed);
             }
         }
     }

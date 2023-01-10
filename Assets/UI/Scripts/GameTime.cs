@@ -66,7 +66,7 @@ public class GameTime : MonoBehaviour
     public bool IsYearCycleCompleted = false;       // 년 - 한 사이클 돌았는지 체크할 변수
     public bool IsGameEnd = false;                  // 게임이 끝났는 지 체크할 변수
 
-    bool isChangeWeek = false;
+    public bool isChangeWeek = false;
 
 
     public void Awake()
@@ -75,6 +75,11 @@ public class GameTime : MonoBehaviour
         {
             instance = this;
         }
+
+        FlowTime.NowYear = Year;
+        FlowTime.NowMonth = Month[MonthIndex];
+        FlowTime.NowWeek = Week[WeekIndex];
+        FlowTime.NowDay = Day[DayIndex];
     }
 
     // Start is called before the first frame update
@@ -91,10 +96,7 @@ public class GameTime : MonoBehaviour
         // Week[0] = "첫째주";
         m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
 
-        FlowTime.NowYear = Year;
-        FlowTime.NowMonth = Month[MonthIndex];
-        FlowTime.NowWeek = Week[WeekIndex];
-        FlowTime.NowDay = Day[DayIndex];
+        
 
         Debug.Log(Year + "년" + " " + Month[MonthIndex] + " " + Week[WeekIndex]);
 

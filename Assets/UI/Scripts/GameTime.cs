@@ -15,6 +15,8 @@ public struct NowTime
 
 /// <summary>
 ///  
+/// 
+/// 시간 -> enum 클래스 로 바꿔서 UI 적으로 보일때만 한글로 보여지도록 하자
 /// </summary>
 public class GameTime : MonoBehaviour
 {
@@ -76,10 +78,7 @@ public class GameTime : MonoBehaviour
             instance = this;
         }
 
-        FlowTime.NowYear = Year;
-        FlowTime.NowMonth = Month[MonthIndex];
-        FlowTime.NowWeek = Week[WeekIndex];
-        FlowTime.NowDay = Day[DayIndex];
+        
     }
 
     // Start is called before the first frame update
@@ -96,7 +95,10 @@ public class GameTime : MonoBehaviour
         // Week[0] = "첫째주";
         m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
 
-        
+        FlowTime.NowYear = Year;
+        FlowTime.NowMonth = Month[MonthIndex];
+        FlowTime.NowWeek = Week[WeekIndex];
+        FlowTime.NowDay = Day[DayIndex];
 
         Debug.Log(Year + "년" + " " + Month[MonthIndex] + " " + Week[WeekIndex]);
 

@@ -25,10 +25,27 @@ public class EventSchedule : MonoBehaviour
 
     public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
 
+    [Header("PossibleCountImg")]
+    public GameObject _nowPossibleCountImg;
 
+    [Space(10f)]
+    [Header("Buttons")]
+    public GameObject Choose_Button;
+    public GameObject SetOK_Button;
 
-    public const int PossibleSetCount = 2;      // 최대 이벤트 지정 가능 횟수
+    [Header("EventInfoWhiteScreen")]
+    public GameObject WhiteScreen;
+
+    [Space(10f)]
+    [Header("SelectdEvent&SetOkEvent")]
+    public GameObject RewardInfoScreen;
+    public GameObject MonthOfRewardInfoScreen;
+
+    const int PossibleSetCount = 2;      // 최대 이벤트 지정 가능 횟수
+    [Space(10f)]
     public int nowPossibleCount = 2;            // 현재 이벤트가능횟수
+
+    
 
     public static EventSchedule Instance
     {
@@ -58,10 +75,15 @@ public class EventSchedule : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (tempEventList == null)
+        {
+            Choose_Button.GetComponent<Button>().interactable = false;
+        }
+
         GiveCalenderInfoToButton();
     }
 
-    int monthArrow = 0;
+    // int monthArrow = 0;
     // Update is called once per frame
     void Update()
     {
@@ -74,72 +96,99 @@ public class EventSchedule : MonoBehaviour
         {
             CalenderButton.Add(CalenderObj.transform.GetChild(i).gameObject);
         }
-
     }
 
+    public void MakeFixedEventInfoPrefab()
+    {
+        foreach (var MyEventList in MyEventList)
+        {
+            if (MyEventList.IsFixedEvent == true)
+            {
+
+            }
+        }
+    }
+
+    // 선택된 이벤트를 보여준기 위한 목록 프리팹 생성 ( )
+    public void MakeSelectEventInfoPrefab()
+    {
+        foreach (var MyEventList in MyEventList)
+        {
+            if (MyEventList.IsFixedEvent == false && 
+                MyEventList.EventClassName == tempEventList.EventClassName)
+            {
+
+            }
+        }
+    }
+
+    // EventNumber에 따라서 프리팹 정렬이 가능하지 않을까?
+
+
     GameObject _PrevClick = null;           // 이전클릭
-    int index;      // 현재 눌린 달력오브젝트를 알기위한 변수
+    int NowIndex;      // 현재 눌린 달력오브젝트를 알기위한 변수 -> 달력의 현재 눌린 인덱스 (하나의 인덱스를 공유해서 문제 생김)
+    int PreIndex = 21;       // 예외처리 해야함 0 값이 되면 버튼 0번이 눌리기 때문에 예외처리 
+    string preEventName = null;    // 인덱스만으로는 이전에 클릭한 버튼의 정보를 모르기에 여기다 담아두자
     //(선택 이벤트)달력 버튼이 눌림 -> 달력 칸에 이벤트 띄우기
     public void ClickCalenderButton()
     {
-        GameObject _NowEvent = EventSystem.current.currentSelectedGameObject;
-        GameObject _NowClick = _NowEvent;       // 현재클릭
+        GameObject _NowClick = EventSystem.current.currentSelectedGameObject;   // 현재클릭
+
         string[] clickdate;
 
         //string[] clickdate = _NowEvent.name.Split("_");
 
-        //선택한 이벤트의 현재 년 / 월
-        tempEventList.EventDay[0] = GameTime.Instance.FlowTime.NowYear.ToString();
-        tempEventList.EventDay[1] = GameTime.Instance.FlowTime.NowMonth;
-
-        // 클릭한 버튼 - 버튼 이름 비교 . 일치 시 버튼에 현재 이벤트의 이름 띄우기
-        for (int i = 0; i < CalenderObj.transform.childCount; i++)
+        if (tempEventList != null)
         {
-            if (_NowClick.name == CalenderButton[i].name)
+            //선택한 이벤트의 현재 년 / 월
+            tempEventList.EventDay[0] = GameTime.Instance.FlowTime.NowYear.ToString();
+            tempEventList.EventDay[1] = GameTime.Instance.FlowTime.NowMonth;
+
+
+            // 클릭한 버튼 - 버튼 이름 비교 . 일치 시 버튼에 현재 이벤트의 이름 띄우기
+            for (int i = 0; i < CalenderObj.transform.childCount; i++)
             {
-                _NowClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tempEventList.EventClassName;
-                index = i;
-                clickdate = CalenderButton[i].name.Split("_");     // "_" 특정 문자열로 이름 나눠주기
+                if (_NowClick.name == CalenderButton[i].name)
+                {
+                    _NowClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tempEventList.EventClassName;
+                    NowIndex = i;
+                    clickdate = CalenderButton[i].name.Split("_");     // "_" 특정 문자열로 이름 나눠주기
 
-                GetSelectedTime(clickdate);     // 선택한 달력의 날짜 받기
+                    GetSelectedTime(clickdate);     // 선택한 달력의 날짜 받기
 
-                break;
+                    break;
+                }
             }
-        }
 
-        // 날짜 하나만 선택되도록 체크(잔상 남지 않도록)
-        if (_PrevClick != _NowClick)
-        {
-            if (_PrevClick != null)
+            // 날짜 하나만 선택되도록 체크(잔상 남지 않도록)
+            if (_PrevClick != _NowClick)
             {
-                _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                if (_PrevClick != null)
+                {
+                    _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                }
+                _PrevClick = _NowClick;
+                // PreIndex = NowIndex;
             }
-            _PrevClick = _NowEvent;
+            else
+            {
+                _PrevClick = _NowClick;
+                // PreIndex = NowIndex;
+            }
+
+            Debug.Log(tempEventList.EventDay[0]);
+            Debug.Log(tempEventList.EventDay[1]);
+            Debug.Log(tempEventList.EventDay[2]);
+            Debug.Log(tempEventList.EventDay[3]);
         }
-        else
-        {
-            _PrevClick = _NowEvent;
-        }
-
-        Debug.Log(tempEventList.EventDay[0]);
-        Debug.Log(tempEventList.EventDay[1]);
-        Debug.Log(tempEventList.EventDay[2]);
-        Debug.Log(tempEventList.EventDay[3]);
 
 
-        // 
-        // if (nowPossibleCount == 0)
-        // {
-        // 
-        // }
     }
 
     // 현재 선택 가능한 이벤트 갯수 세는 함수
     public void CountPossibleEventSetting()
     {
         _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-
-        GameObject _nowPossibleCountImg = GameObject.Find("PossibleSelectCountInfo");
 
         MyEventList.Add(tempEventList);
 
@@ -158,52 +207,127 @@ public class EventSchedule : MonoBehaviour
 
         if (nowPossibleCount == 0)
         {
+            Choose_Button.transform.GetComponent<Button>().interactable = false;
+            _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(true);
             Debug.Log("이제 선택 못함");
-            ShowSelectedEventSettingOKButton();
+            //ShowSelectedEventSettingOKButton();
         }
     }
 
     // 선택된 일정칸 버튼의 데이터를 해당 이벤트의 날짜에 넣어주기
     public void SaveEventOnCalender()
     {
+        _PrevClick = null;      // 이전클릭 초기화시켜주기
+
         for (int i = 0; i < MyEventList.Count; i++)
         {
-            if(MyEventList[i].EventKeyward == "Select" && tempEventList.EventClassName == MyEventList[i].EventClassName)
+            if (MyEventList[i].IsFixedEvent == false && tempEventList.EventClassName == MyEventList[i].EventClassName)
             {
+                if (PreIndex == 21)
+                {
+                    PreIndex = NowIndex;
+                    preEventName = tempEventList.EventClassName;
+                }
+
                 string tempName = MyEventList[i].EventClassName;
-                CalenderButton[index].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tempName;
-                CalenderButton[index].transform.GetComponent<Button>().interactable = false;
+                CalenderButton[NowIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tempName;
+                CalenderButton[NowIndex].transform.GetComponent<Button>().interactable = false;
             }
         }
-        // if (Event_One == null)
-        // {
-        //     Event_One = _PrevClick;
-        //
-        //     //Event_One.transform.
-        //     Event_One.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = MyEventList[0].EventClassName;
-        //     Event_One.transform.GetComponent<Button>().interactable = false;
-        // }
-        // else if (Event_One != null)
-        // {
-        //     Event_Two = _PrevClick;
-        //
-        //     Event_Two.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = MyEventList[1].EventClassName;
-        //     Event_Two.transform.GetComponent<Button>().interactable = false;
-        // }
     }
 
-    public GameObject RewardInfoScreen;
-    public GameObject MonthOfRewardInfoScreen;
+    public void IfClickBackButton()
+    {
+        if (_PrevClick != null)
+        {
+            _PrevClick.SetActive(true);
+            _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+            WhiteScreen.SetActive(true);
+            tempEventList = null;
+            Choose_Button.transform.GetComponent<Button>().interactable = false;
+            _PrevClick = null;
+        }
+        else
+        {
+            WhiteScreen.SetActive(true);
+            tempEventList = null;
+            Choose_Button.transform.GetComponent<Button>().interactable = false;
+            _PrevClick = null;
+        }
+    }
 
+    // 선택 버튼을 눌렀는지 설정완료 버튼을 눌렀는지 체크해서 보여줄 Info 창을 선택하자
     public void ShowSelectedEventSettingOKButton()
     {
-        RewardInfoScreen.SetActive(false);
-        MonthOfRewardInfoScreen.SetActive(true);
+        GameObject _NowClick = EventSystem.current.currentSelectedGameObject;
+
+        if (_NowClick.name == Choose_Button.name)
+        {
+            RewardInfoScreen.SetActive(true);
+            MonthOfRewardInfoScreen.SetActive(false);
+        }
+        else if (_NowClick.name == SetOK_Button.name)
+        {
+            tempEventList = null;
+            RewardInfoScreen.SetActive(false);
+            MonthOfRewardInfoScreen.SetActive(true);
+        }
     }
 
+    // 취소는 현재 내가 누른 이벤트목록의 이벤트와 달력의 정보를 알 수 없으므로 작동하지 않음
+    // 조건과 데이터를 더 잘 연결해서 만들면 될듯
+    // 고정이벤트는 리스트에 들어가고, 현재 리스트에서 고정 키워드를 찾아 달력에 그려주면 그려질듯
+    // 선택 이벤트 두개가 선택되면 더이상 버튼이 눌리지 않고, 이벤트 취소를 누르면 횟수가 돌아오고,
+    // 이렇게 작동하도록 하자
     public void IfIWantCancleEvent()
     {
-        // if()
+        // 요소를 삭제 할 때 인덱스의 변화로 인해 무언가 이상이 생길 수 있으므로 - 를 해가며 체크
+        for (int i = MyEventList.Count - 1; i > 0; i--)
+        {
+            if (MyEventList[i].EventClassName == tempEventList.EventClassName
+                && MyEventList[i].IsFixedEvent == false)
+            {
+
+                if (preEventName == tempEventList.EventClassName)
+                {
+                    CalenderButton[PreIndex].transform.GetComponent<Button>().interactable = true;
+                    CalenderButton[PreIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                }
+                else
+                {
+                    CalenderButton[NowIndex].transform.GetComponent<Button>().interactable = true;
+                    CalenderButton[NowIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+                }
+
+                if (nowPossibleCount == 1)          // 이벤트 하나만 있을 때
+                {
+                    _nowPossibleCountImg.transform.GetChild(1).gameObject.SetActive(true);
+                    _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(false);
+
+                    _PrevClick = null;
+                    PreIndex = 21;
+                    tempEventList = null;
+                }
+                else if (nowPossibleCount == 0)     // 이벤트 2개 다 차있을때
+                {
+                    _nowPossibleCountImg.transform.GetChild(0).gameObject.SetActive(true);
+                }
+
+                ShowSelectedEventSettingOKButton();
+
+                // 제한 횟수도 늘려주기
+                if (nowPossibleCount < PossibleSetCount)
+                {
+                    nowPossibleCount += 1;
+                }
+
+                Choose_Button.transform.GetComponent<Button>().interactable = false;
+                WhiteScreen.SetActive(true);
+
+
+                MyEventList.Remove(MyEventList[i]);
+            }
+        }
     }
 
     public void GetSelectedTime(string[] click)
@@ -247,4 +371,15 @@ public class EventSchedule : MonoBehaviour
             tempEventList.EventDay[3] = GameTime.Instance.Day[4];
         }
     }
+
+    // 이벤트선택 창에서 선택완료 라는 버튼을 누르면 고정이벤트가 뜬 상태로 뜨게 하기
+    // 아니면 그냥 뜨게 하기? 이건 얘기해보기
+    public void ShowFixedEventOnCalender()
+    {
+
+    }
+
+
+    // 달력 버튼 눌렀을 때 그 달의 일정을 보여주는 달력창을 만들어야 한다
+    // 만들어둔 달력 체크 화면의 것을 옮겨다가 보여주고, 다시 끄면 원래 곳으로 옮겨주고
 }

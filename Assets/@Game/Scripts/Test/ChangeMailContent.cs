@@ -27,15 +27,13 @@ public class MailBox
 
 public class ChangeMailContent : MonoBehaviour
 {
-    [SerializeField] private Button m_NewMailButton;
-    [SerializeField] private GameObject m_Button;
-    [SerializeField] private MailSystem m_IsNewMail;
-    [SerializeField] private GameObject m_NotNewMail;
-    [SerializeField] private GameObject m_ReadMailContent;
-    [SerializeField] private Transform m_MailBox;
-    [SerializeField] private GameObject m_TempNotNewMail;
-    [SerializeField] private GameObject m_BulbIcon;
-    [SerializeField] private GameObject m_Filter;
+    [SerializeField] private Button m_NewMailButton;        // 신규메일 버튼
+    [SerializeField] private GameObject m_Button;           // 처음 메일함을 누르면 무조선 신규메일로 만들어주기 위한 오브젝트
+    [SerializeField] private GameObject m_ReadMailContent;  // 메일 내용이 있는 오브젝트. 메일 내용들을 넣어줘야한다.
+    [SerializeField] private Transform m_MailBox;           // 발송된 메일들이 어디에 생성될 지 결정해주는 Transform
+    [SerializeField] private GameObject m_NotNewMail;       // 새로운 메일이 없으면 "신규메일이 없습니다"를 띄워주기 위한 오브젝트
+    [SerializeField] private GameObject m_BulbIcon;         // 신규메일이 발송되면 메일함에 띄울 이미지
+    [SerializeField] private GameObject m_Filter;           // 타입별로 메일을 볼 수있게 하기위한 오브젝트
 
     private GameObject m_ClickMailButton;   // 전체 메일함인지 신규 메일함인지 기억해야한다.
     private GameObject m_CheckMailName;     // 내가 읽으려고 하는 메일이 무엇인지 알기위한 변수
@@ -43,12 +41,12 @@ public class ChangeMailContent : MonoBehaviour
 
     // 메일을 관리하기 위한 리스트들
     private Dictionary<string, MailBox> m_Mail = new Dictionary<string, MailBox>();     // 발송에 씌이는 전체 메일
-    private List<MailBox> m_MailList = new List<MailBox>();  // 새로온 메일 내용
-    private List<GameObject> m_NewMailTextList = new List<GameObject>(); // 새로 받은 메일들을 쌓아 둘 리스트
-    private List<GameObject> m_AllMailTextList = new List<GameObject>(); // 여태것 받은 메일들을 쌓아 둘 리스트
+    private List<MailBox> m_MailList = new List<MailBox>();                             // 새로온 메일 내용
+    private List<GameObject> m_NewMailTextList = new List<GameObject>();                // 새로 받은 메일들을 쌓아 둘 리스트
+    private List<GameObject> m_AllMailTextList = new List<GameObject>();                // 여태것 받은 메일들을 쌓아 둘 리스트
 
-    int _i = 0;
-    bool _isNewMAilCheck = false;
+    int _i = 0;                     // 전체 메일함에서 순서대로 메일들을 발송해주기 위해 만든 int값. 메일을 발송하고 나면 증가시켜준다(추후 메일 컨텐츠가 나온다면 바꿔야할 거 같다).
+    bool _isNewMAilCheck = false;   // 현재 새로온 메일이 있는지 확인해주는 bool값
     bool _isClick = false;          // 필터 버튼을 눌렀을 때 필터를 껐다 켰다 할 수 있게 해주려고 만든 bool값
 
     private void Start()
@@ -91,6 +89,7 @@ public class ChangeMailContent : MonoBehaviour
         return -1;
     }
 
+    // 인게임 UI 메일함을 눌렀을 때 새로온 메일이 있나 없나 확인해보고 새로운 메일이 없습니다를 띄워주는 역할
     public void SetButtonColor()
     {
         m_NewMailButton.Select();
@@ -115,11 +114,11 @@ public class ChangeMailContent : MonoBehaviour
 
         if (!_isNewMail)
         {
-            m_TempNotNewMail.SetActive(true);
+            m_NotNewMail.SetActive(true);
         }
         else
         {
-            m_TempNotNewMail.SetActive(false);
+            m_NotNewMail.SetActive(false);
         }
     }
 
@@ -230,7 +229,7 @@ public class ChangeMailContent : MonoBehaviour
 
                 if (!_isNewMAilCheck)
                 {
-                    m_TempNotNewMail.SetActive(true);
+                    m_NotNewMail.SetActive(true);
                 }
             }
             else
@@ -254,7 +253,7 @@ public class ChangeMailContent : MonoBehaviour
 
                 if (m_MailBox.childCount == 0)
                 {
-                    m_TempNotNewMail.SetActive(true);
+                    m_NotNewMail.SetActive(true);
                 }
             }
         }
@@ -281,7 +280,7 @@ public class ChangeMailContent : MonoBehaviour
                 m_AllMailText.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = m_MailList[i].m_FromMail;
                 m_AllMailText.transform.GetChild(6).GetComponent<Button>().onClick.AddListener(ReadMail);
             }
-            m_TempNotNewMail.SetActive(false);
+            m_NotNewMail.SetActive(false);
         }
     }
 
@@ -322,7 +321,7 @@ public class ChangeMailContent : MonoBehaviour
 
             if (!_isNewMail)
             {
-                m_TempNotNewMail.SetActive(true);
+                m_NotNewMail.SetActive(true);
                 _isNewMAilCheck = false;
             }
 
@@ -330,7 +329,7 @@ public class ChangeMailContent : MonoBehaviour
 
             if (m_MailBox.childCount == 0)
             {
-                m_TempNotNewMail.SetActive(true);
+                m_NotNewMail.SetActive(true);
             }
         }
         // 전체메일함에서는 꺼주기만 하면 된다.
@@ -444,11 +443,11 @@ public class ChangeMailContent : MonoBehaviour
                         _isNewMAilCheck = true;
                     }
                 }
-                m_TempNotNewMail.SetActive(false);
+                m_NotNewMail.SetActive(false);
 
                 if (m_MailBox.childCount == 0)
                 {
-                    m_TempNotNewMail.SetActive(true);
+                    m_NotNewMail.SetActive(true);
                 }
             }
             else
@@ -469,11 +468,11 @@ public class ChangeMailContent : MonoBehaviour
                         _isNewMAilCheck = true;
                     }
                 }
-                m_TempNotNewMail.SetActive(false);
+                m_NotNewMail.SetActive(false);
 
                 if (m_MailBox.childCount == 0)
                 {
-                    m_TempNotNewMail.SetActive(true);
+                    m_NotNewMail.SetActive(true);
                 }
             }
         }
@@ -507,11 +506,11 @@ public class ChangeMailContent : MonoBehaviour
                 m_AllMailText.transform.GetChild(6).GetComponent<Button>().onClick.AddListener(ReadMail);
             }
         }
-        m_TempNotNewMail.SetActive(false);
+        m_NotNewMail.SetActive(false);
 
         if (m_MailBox.childCount == 0)
         {
-            m_TempNotNewMail.SetActive(true);
+            m_NotNewMail.SetActive(true);
         }
     }
 
@@ -564,7 +563,7 @@ public class ChangeMailContent : MonoBehaviour
 
                     if (!_isNewMAilCheck)
                     {
-                        m_TempNotNewMail.SetActive(true);
+                        m_NotNewMail.SetActive(true);
                     }
 
                 }
@@ -586,11 +585,11 @@ public class ChangeMailContent : MonoBehaviour
                             _isNewMAilCheck = true;
                         }
                     }
-                    m_TempNotNewMail.SetActive(false);
+                    m_NotNewMail.SetActive(false);
                 }
                 else if (m_NewMailTextList.Count == 0)
                 {
-                    m_TempNotNewMail.SetActive(true);
+                    m_NotNewMail.SetActive(true);
                 }
             }
         }
@@ -633,7 +632,7 @@ public class ChangeMailContent : MonoBehaviour
                     m_AllMailText.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = m_MailList[i].m_FromMail;
                     m_AllMailText.transform.GetChild(6).GetComponent<Button>().onClick.AddListener(ReadMail);
                 }
-                m_TempNotNewMail.SetActive(false);
+                m_NotNewMail.SetActive(false);
             }
         }
     }

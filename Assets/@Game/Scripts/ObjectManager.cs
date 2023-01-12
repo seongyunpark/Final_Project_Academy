@@ -4,6 +4,7 @@ using UnityEngine;
 using StatData.Runtime;
 using Conditiondata.Runtime;
 using BT;
+using BehaviorDesigner.Runtime;
 
 /// <summary>
 /// 학생과 교수의 생성, 삭제를 관리해주는 스크립트
@@ -21,6 +22,7 @@ public class ObjectManager : MonoBehaviour
     [SerializeField] private List<GameObject> m_CharacterPartsHair = new List<GameObject>();
     [SerializeField] private List<GameObject> m_CharacterPartsTop = new List<GameObject>();
     [SerializeField] private List<GameObject> m_CharacterPartsBottom = new List<GameObject>();
+    [SerializeField] private ExternalBehaviorTree studentTree;
 
     public GameObject StudentOriginal;    /// 원본으로 사용할 프리팹(을 받는 GameObject)
 
@@ -54,6 +56,7 @@ public class ObjectManager : MonoBehaviour
 
     // 학생 오브젝트를 필요할 때 동적으로 생성해주기 위한 함수
     // 랜덤한 숫자를 가져와서 데이터베이스에 있는 학생의 정보를 무작위로 가져온다
+    // 학생을 생성할 때 파츠를 오브젝트로 생성하는게 아니라 Mesh를 바꿔주는걸로 해주기
     public void CreateStudent()
     {
         int _randomStudent = Random.Range(0, 5);
@@ -97,8 +100,24 @@ public class ObjectManager : MonoBehaviour
         // 엔티티로부터 스크립트를 얻어낸다
         Student _student = _newStudentObject.GetComponent<Student>();
 
+        // 학생에 BT컴포넌트를 붙여준다
+        _newStudentObject.GetComponent<BehaviorTree>().StartWhenEnabled = true;
+        _newStudentObject.GetComponent<BehaviorTree>().PauseWhenDisabled = true;
+        _newStudentObject.GetComponent<BehaviorTree>().RestartWhenComplete = true;
+
+        _newStudentObject.GetComponent<BehaviorTree>().DisableBehavior();
+
+        ExternalBehavior studentTreeInstance = Instantiate(studentTree);
+        studentTreeInstance.Init();
+
+        // 학생들의 변수값 설정해주기
+        //studentTreeInstance.SetVariableValue();
+
+        _newStudentObject.GetComponent<BehaviorTree>().ExternalBehavior = studentTreeInstance;
+        _newStudentObject.GetComponent<BehaviorTree>().EnableBehavior();
+        
         // 그 스크립트로부터 이런 저런 처리를 한다.
-        Node _node = CreateNode(_student);
+        //Node _node = CreateNode(_student);
 
         StudentStat _stat = new StudentStat(m_StatController.dataBase.studentDatas[_randomStudent]);
 
@@ -106,7 +125,7 @@ public class ObjectManager : MonoBehaviour
 
         StudentCondition _studentCondition = new StudentCondition(m_conditionData.dataBase.studentCondition[0]);
 
-        _student.Initialize(_stat, _studentName, _studentCondition, _node);
+        _student.Initialize(_stat, _studentName, _studentCondition);
 
         // 새로 만든 학생 오브젝트의 위치를 0으로 돌린다.
         _student.transform.position = new Vector3(0, 0, 0);
@@ -176,10 +195,5 @@ public class ObjectManager : MonoBehaviour
         //_root.AddChildNode(_freeWalkSeq);
 
         return _root;
-    }
-
-    void CharacterRandomParts()
-    {
-
     }
 }

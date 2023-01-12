@@ -48,6 +48,8 @@ public class InGameTest : MonoBehaviour
     private List<Student> _startClassStudent = new List<Student>();
     private List<StatModifier> _startClassMagnitude = new List<StatModifier>();
 
+    public string m_ClassState = "nothing";
+
     public static InGameTest Instance
     {
         get

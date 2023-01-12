@@ -38,8 +38,10 @@ public class ClockScheduler : MonoBehaviour
         // 리스트를 삭제 해줘야 한다면 여기 아래에서
 
         // 월 바뀌었을 때
-        if (nowDate == "월요일" && nowWeek == "첫째 주")
+        if (nowDate == "월요일" && nowWeek == "첫째 주" && nowMonth != GameTime.Instance.FlowTime.NowMonth)
         {
+            Debug.Log("나의 현 월 이벤트리스트 싹 비우기");
+
             EventSchedule.Instance.MyEventList.Clear();
         }
     }

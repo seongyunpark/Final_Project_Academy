@@ -5,6 +5,39 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 
+public enum eMonth
+{
+    January,
+    February,
+    March, 
+    April,
+    May,
+    June,
+    July,
+    August,
+    September,
+    October,
+    November,
+    December
+}
+
+public enum eWeek
+{
+    Week1,
+    Week2,
+    Week3,
+    Week4
+}
+
+public enum eDate
+{
+    Monday,
+    Tuesday,
+    Wednsday,
+    Thursday,
+    Friday
+}
+
 public struct NowTime
 {
     public int NowYear;

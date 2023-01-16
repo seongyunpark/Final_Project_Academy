@@ -164,9 +164,9 @@ public class EventClassPrefab : MonoBehaviour
         // }
         // LoadFixedEventList(month);
 
-        MakeSelectedEventInfoPrefab();
-        MakePossibleEventPrefab();
-        PutOnPossibleEventData(month);
+        // MakeSelectedEventInfoPrefab();
+        // MakePossibleEventPrefab();
+        // PutOnPossibleEventData(month);
     }
 
     // Update is called once per frame

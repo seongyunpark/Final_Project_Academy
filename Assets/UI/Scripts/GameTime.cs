@@ -111,7 +111,7 @@ public class GameTime : MonoBehaviour
             instance = this;
         }
 
-        
+
     }
 
     // Start is called before the first frame update
@@ -202,11 +202,11 @@ public class GameTime : MonoBehaviour
 
     public void ChangeDay()
     {
-        if(DayIndex != 4)
+        if (DayIndex != 4)
         {
             DayIndex++;
         }
-        else if(DayIndex == 4)
+        else if (DayIndex == 4)
         {
             DayIndex = 0;
         }
@@ -254,7 +254,14 @@ public class GameTime : MonoBehaviour
     int i = 0;
     public void CheckPerSecond()
     {
-        if (GameTime.Instance.IsGameMode == true)
+        // 수업을 시작했을 때 캐릭터는 움직이지만 시간은 흐르지않게 할 때 PrevTime을 갱신해주지 않으면 수업 시작 시 시간이 재빠르게 흐른다.
+        if (InGameTest.Instance.m_ClassState == ClassState.ClassStart)
+        {
+            PrevTime = Time.time;
+        }
+
+        // 수업시작 후 반에 도착할 때 까지는 시간이 흐르면 안된다. TimeScale을 멈추면 캐릭터가 움직이지 않으니 다른 방법으로,,
+        if (GameTime.Instance.IsGameMode == true && InGameTest.Instance.m_ClassState != ClassState.ClassStart)
         {
             if (Week[WeekIndex] == "첫째 주" || Week[WeekIndex] == "둘째 주")
             {

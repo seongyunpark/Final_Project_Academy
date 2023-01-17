@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class SaveEventData
@@ -37,12 +39,20 @@ public class SwitchEventList : MonoBehaviour
     public Transform m_PossibleParentScroll;      // 
 
     [Space(10f)]
+    [Tooltip("이벤트 선택 창 눌렀을 때 나올 설명 창의 부모")]
+    [Header("EventList Prefab")]
+    public GameObject m_EventInfoParent;     // 
+
+    [Space(10f)]
     [Tooltip("달력 창의 선택된 이벤트 리스트를 만들 프리팹변수들")]
     [Header("SelectdEvent&SetOkEvent Prefab")]
     public GameObject m_FixedPrefab;
     public GameObject m_SelectedPrefab;
     public Transform m_ParentCalenderScroll;
 
+    [Space(10f)]
+    [Header("EventInfoWhiteScreen")]
+    public GameObject WhiteScreen;
 
     // Json 파일을 파싱해서 그 데이터들을 다 담아 줄 리스트 변수
     // 이 변수들도 EventSchedule 의 Instance.변수 들에 넣어주고 쓰도록 하자
@@ -51,6 +61,7 @@ public class SwitchEventList : MonoBehaviour
     //
 
     public List<SaveEventClassData> PossibleChooseEventClassList = new List<SaveEventClassData>();      //  사용가능한 선택이벤트 목록
+    public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
 
     public SaveEventClassData IfIChoosedEvent;           // 현재 선택한 이벤트 담아 줄 임시 변수
 
@@ -141,8 +152,6 @@ public class SwitchEventList : MonoBehaviour
                 index = 0;
             }
             TempEventData.EventDay[1] = GameTime.Instance.Month[index];
-            TempEventData.EventDay[2] = GameTime.Instance.Week[index];
-            TempEventData.EventDay[3] = GameTime.Instance.Day[index];
 
             TempEventData.IsPossibleUseEvent = true;
             TempEventData.IsFixedEvent = false;      // 고정이벤트인지 선택이벤트인지 구별할 키워드
@@ -174,17 +183,6 @@ public class SwitchEventList : MonoBehaviour
         }
     }
 
-    // 데이터가 있는지 확인 후 필요한 오브젝트풀의 오브젝트 갯수만큼 옮기기
-    public void PutOnFixedEventList(string month)
-    {
-        // FixedEventClassInfo 여기에 정보가 들어있고
-        // if ()
-        {
-
-        }
-    }
-
-
     // 조건에 맞는 고정이벤트데이터를 MyFixedEventList 에 넣어주기
     public void PutOnFixedEventData(string month)
     {
@@ -211,6 +209,7 @@ public class SwitchEventList : MonoBehaviour
                 CalenderEventList = MailObjectPool.GetFixedEventObject(m_ParentCalenderScroll);
 
                 // 고정은 필요한 조건 만큼 걸러지므로 바로 ScrollView 에 오브젝트를 넣는다
+                CalenderEventList.name = FixedEventClassInfo[i].EventClassName;
 
                 CalenderEventList.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventDay[2];
                 CalenderEventList.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventDay[3];
@@ -223,7 +222,6 @@ public class SwitchEventList : MonoBehaviour
                 break;
             }
         }
-
     }
 
     // 선택가능 이벤트 리스트에 정보 넣기
@@ -231,8 +229,11 @@ public class SwitchEventList : MonoBehaviour
     {
         GameObject PossibleEventList;              // 선택가능이벤트들 부모
 
+        WhiteScreen.SetActive(true);
+
         for (int i = 0; i < SelectEventClassInfo.Count; i++)
         {
+            int statArrow = 0;
             PossibleEventList = MailObjectPool.GetPossibleEventObject(m_PossibleParentScroll);
 
             // 선택 이벤트 & 선택이벤트인지 & 사용가능한지 / 사용가능한지
@@ -240,20 +241,30 @@ public class SwitchEventList : MonoBehaviour
                 && SelectEventClassInfo[i].IsPossibleUseEvent == true)
                 || SelectEventClassInfo[i].IsPossibleUseEvent == true)
             {
+                PossibleEventList.name = SelectEventClassInfo[i].EventClassName;
                 PossibleEventList.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventClassName;
+
+
+                if (SelectEventClassInfo[i].EventRewardMoney != 0)
+                {
+                    PossibleEventList.transform.GetChild(1).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardMoney.ToString();
+
+                    statArrow += 1;
+                }
 
                 for (int j = 0; j < SelectEventClassInfo[i].EventRewardStat.Length; j++)
                 {
-                    if (SelectEventClassInfo[i].EventRewardStat != null)
+                    if (SelectEventClassInfo[i].EventRewardStat[j] != 0)
                     {
-                        PossibleEventList.transform.GetChild(1).GetChild(j).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStatName[j];
+                        PossibleEventList.transform.GetChild(1).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStatName[j];
+                        statArrow += 1;
                     }
                     else
                     {
-                        PossibleEventList.transform.GetChild(1).GetChild(j).gameObject.SetActive(false);
+                        PossibleEventList.transform.GetChild(1).GetChild(statArrow).gameObject.SetActive(false);
+                        statArrow += 1;
                     }
                 }
-
 
                 PossibleChooseEventClassList.Add(SelectEventClassInfo[i]);
             }
@@ -261,6 +272,65 @@ public class SwitchEventList : MonoBehaviour
             {
                 break;
             }
+
+            statArrow = 0;
+
+            // 선택가능 이벤트 스크롤뷰에서 버튼을 클릭시 지정 함수로 넘어가도록 한다.
+            PossibleEventList.GetComponent<Button>().onClick.AddListener(ShowISelectedPossibleEvent);
+        }
+    }
+
+    public void ShowISelectedPossibleEvent()
+    {
+        GameObject _NowEvent = EventSystem.current.currentSelectedGameObject;
+        // WhiteScreen.SetActive(false);
+
+
+        Debug.Log("이벤트 선택");
+        for (int i = 0; i < PossibleChooseEventClassList.Count; i++)
+        {
+            int statArrow = 0;
+
+            if (_NowEvent.name == PossibleChooseEventClassList[i].EventClassName)
+            {
+                m_EventInfoParent.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = PossibleChooseEventClassList[i].EventClassName;
+                m_EventInfoParent.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = PossibleChooseEventClassList[i].EventInformation;
+
+                if (PossibleChooseEventClassList[i].EventRewardMoney != 0)
+                {
+                    m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = "머니";
+                    m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardMoney.ToString();
+
+                    statArrow += 1;
+                }
+
+                for (int j = 0; j < PossibleChooseEventClassList[i].EventRewardStat.Length; j++)
+                {
+                    if (SelectEventClassInfo[i].EventRewardStat[j] != 0)
+                    {
+                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStatName[j];
+                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStat[j].ToString();
+                    }
+                    else
+                    {
+                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).gameObject.SetActive(false);
+                    }
+                    statArrow += 1;
+                }
+
+                // 여기서 임시로 내가 선택한 데이터를 담아둔다
+                IfIChoosedEvent = SelectEventClassInfo[i];
+                EventSchedule.Instance.tempEventList = SelectEventClassInfo[i];
+                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
+
+                Debug.Log(IfIChoosedEvent.EventClassName);
+
+            }
+        }
+        // 이벤트 설명 창을 깔끔하게 안보이게 하다가 내용을 보이게 하기 위해 어거지로 만든 배경
+        if (WhiteScreen.activeSelf == true)
+        {
+            WhiteScreen.SetActive(false);
         }
     }
 

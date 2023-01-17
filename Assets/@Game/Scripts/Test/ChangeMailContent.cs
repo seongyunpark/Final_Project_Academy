@@ -49,6 +49,7 @@ public class ChangeMailContent : MonoBehaviour
     bool _isNewMAilCheck = false;   // 현재 새로온 메일이 있는지 확인해주는 bool값
     bool _isClick = false;          // 필터 버튼을 눌렀을 때 필터를 껐다 켰다 할 수 있게 해주려고 만든 bool값
 
+
     private void Start()
     {
         m_ClickMailButton = m_Button;

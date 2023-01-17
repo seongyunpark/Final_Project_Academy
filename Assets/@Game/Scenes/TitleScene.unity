@@ -457,6 +457,7 @@ MonoBehaviour:
   m_UI: {fileID: 676775794}
   m_DelayTime: 0
   m_ClassPrefab: {fileID: 0}
+  m_ProfessorPrefab: {fileID: 0}
 --- !u!1 &49804258
 GameObject:
   m_ObjectHideFlags: 0
@@ -2017,7 +2018,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &455518819
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5378,6 +5379,7 @@ MonoBehaviour:
   m_UI: {fileID: 1328414086}
   m_DelayTime: 0
   m_ClassPrefab: {fileID: 0}
+  m_ProfessorPrefab: {fileID: 0}
 --- !u!1 &1024421406
 GameObject:
   m_ObjectHideFlags: 0
@@ -6981,6 +6983,7 @@ MonoBehaviour:
   m_UI: {fileID: 1875378211}
   m_DelayTime: 0
   m_ClassPrefab: {fileID: 0}
+  m_ProfessorPrefab: {fileID: 0}
 --- !u!1 &1328414086
 GameObject:
   m_ObjectHideFlags: 0
@@ -9653,6 +9656,7 @@ MonoBehaviour:
   m_UI: {fileID: 1649420751}
   m_DelayTime: 1
   m_ClassPrefab: {fileID: 0}
+  m_ProfessorPrefab: {fileID: 0}
 --- !u!1 &1657418509
 GameObject:
   m_ObjectHideFlags: 0
@@ -10733,7 +10737,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ReferenceResolution: {x: 3200, y: 1440}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

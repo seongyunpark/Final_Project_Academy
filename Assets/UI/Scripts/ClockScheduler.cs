@@ -16,7 +16,7 @@ public class ClockScheduler : MonoBehaviour
     string nowWeek;
     string nowDate;
 
-    EventClassPrefab EventPrefab;
+    SwitchEventList EventPrefab;
 
     // Start is called before the first frame update
     void Start()
@@ -27,7 +27,7 @@ public class ClockScheduler : MonoBehaviour
         nowDate = GameTime.Instance.FlowTime.NowDay;
 
 
-        EventPrefab = GameObject.Find("EventClassPrefab").GetComponent<EventClassPrefab>();
+        // EventPrefab = GameObject.Find("EventClassPrefab").GetComponent<SwitchEventList>();
     }
 
     // Update is called once per frame

@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 8450934139388433303}
   - component: {fileID: -4007326890499371423}
   - component: {fileID: 6658299915427880452}
-  - component: {fileID: 6884765076846605324}
+  - component: {fileID: -4393316826473684555}
   m_Layer: 0
   m_Name: _Student
-  m_TagString: Untagged
+  m_TagString: Student
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,9 +74,11 @@ MonoBehaviour:
   m_NameStudent: Su
   isHereRestaurant: 0
   isArrivedClass: 0
+  isDesSetting: 0
+  isInteracting: 0
   m_RestaurantNumOfPeople: 0
   m_Destination: ' '
---- !u!114 &6884765076846605324
+--- !u!114 &-4393316826473684555
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,7 +97,7 @@ MonoBehaviour:
   logTaskChanges: 0
   group: 0
   resetValuesOnRestart: 0
-  externalBehavior: {fileID: 11400000, guid: 99528449098848048b2119b5d80765e0, type: 2}
+  externalBehavior: {fileID: 0}
   mBehaviorSource:
     behaviorName: Behavior
     behaviorDescription: 
@@ -114,7 +116,7 @@ MonoBehaviour:
         byteData: 
         byteDataArray: 
       Version: 
-  gizmoViewMode: 2
+  gizmoViewMode: 0
   showBehaviorDesignerGizmo: 1
 --- !u!1001 &8643904464343387826
 PrefabInstance:

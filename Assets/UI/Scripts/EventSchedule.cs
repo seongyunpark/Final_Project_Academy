@@ -45,7 +45,7 @@ public class EventSchedule : MonoBehaviour
     [Space(10f)]
     public int nowPossibleCount = 2;            // 현재 이벤트가능횟수
 
-    
+
 
     public static EventSchedule Instance
     {
@@ -114,7 +114,7 @@ public class EventSchedule : MonoBehaviour
     {
         foreach (var MyEventList in MyEventList)
         {
-            if (MyEventList.IsFixedEvent == false && 
+            if (MyEventList.IsFixedEvent == false &&
                 MyEventList.EventClassName == tempEventList.EventClassName)
             {
 

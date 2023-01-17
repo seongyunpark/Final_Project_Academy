@@ -4,19 +4,25 @@ using BehaviorDesigner.Runtime.Tasks;
 
 public class CheckClass : Conditional
 {
+    bool isClassDesSetting = false;
+
     public override TaskStatus OnUpdate()
     {
-        if (InGameTest.Instance.m_ClassState == "ClassStart")
+        if (InGameTest.Instance.m_ClassState == ClassState.ClassStart)
         {
-            if (!gameObject.GetComponent<Student>().isDesSetting == false)
+            if (isClassDesSetting == false)
             {
                 SetClassDestination();
             }
             return TaskStatus.Success;
         }
-        else if(InGameTest.Instance.m_ClassState == "ClassEnd" )
+        else if (InGameTest.Instance.m_ClassState == ClassState.Studying)
         {
-            if(gameObject.GetComponent<Student>().isDesSetting)
+            return TaskStatus.Success;
+        }
+        else if(InGameTest.Instance.m_ClassState == ClassState.ClassEnd )
+        {
+            if(gameObject.GetComponent<Student>().isDesSetting == false)
             {
                 SetClassEndDestination();
             }
@@ -33,14 +39,28 @@ public class CheckClass : Conditional
         gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("ClassEntrance");
         gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("ClassSeat");
         gameObject.GetComponent<Student>().isDesSetting = true;
+        isClassDesSetting = true;
     }
 
     void SetClassEndDestination()
     {
         gameObject.GetComponent<Student>().m_DestinationQueue.Clear();
 
-        int _rand = Random.Range(1, 3);
+        int _rand = Random.Range(0, 3);
 
-
+        if (_rand == 0)
+        {
+            gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("FreeWalk1");
+        }
+        else if (_rand == 1)
+        {
+            gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("FreeWalk2");
+        }
+        else if (_rand == 2)
+        {
+            gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("FreeWalk3");
+        }
+        gameObject.GetComponent<Student>().isDesSetting = true;
+        isClassDesSetting = false;
     }
 }

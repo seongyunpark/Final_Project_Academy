@@ -51,19 +51,30 @@ public class SwitchEventList : MonoBehaviour
     public Transform m_ParentCalenderScroll;
 
     [Space(10f)]
+    [Tooltip("달력 창의 선택된 이벤트 설명")]
+    [Header("SelectdEvent On Calender")]
+    public GameObject m_EventInfoOnCaledner;
+
+    [Space(10f)]
+    [Tooltip("이벤트 선택 때 취소 할 수 있는 버튼")]
+    [Header("Event Setting Screen CancleButton")]
+    public GameObject m_CancleEventButton;
+
+    [Space(10f)]
     [Header("EventInfoWhiteScreen")]
     public GameObject WhiteScreen;
 
     // Json 파일을 파싱해서 그 데이터들을 다 담아 줄 리스트 변수
     // 이 변수들도 EventSchedule 의 Instance.변수 들에 넣어주고 쓰도록 하자
-    public List<SaveEventClassData> SelectEventClassInfo = new List<SaveEventClassData>();       // 전체 선택 이벤트
-    public List<SaveEventClassData> FixedEventClassInfo = new List<SaveEventClassData>();           // 전체 고정 이벤트
+    public List<SaveEventClassData> SelectEventClassInfo = new List<SaveEventClassData>();              // 전체 선택 이벤트
+    public List<SaveEventClassData> FixedEventClassInfo = new List<SaveEventClassData>();               // 전체 고정 이벤트
     //
 
     public List<SaveEventClassData> PossibleChooseEventClassList = new List<SaveEventClassData>();      //  사용가능한 선택이벤트 목록
-    public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
+    public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();                       // 현재 나의 이벤트 목록
 
-    public SaveEventClassData IfIChoosedEvent;           // 현재 선택한 이벤트 담아 줄 임시 변수
+    public List<SaveEventClassData> PrevIChoosedEvent = new List<SaveEventClassData>();                 // 현재 선택한 이벤트 담아 줄 임시 변수
+    public SaveEventClassData TempIChoosed;
 
     string month;
 
@@ -215,13 +226,15 @@ public class SwitchEventList : MonoBehaviour
                 CalenderEventList.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventDay[3];
                 CalenderEventList.transform.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventClassName;
 
-                EventSchedule.Instance.MyEventList.Add(SelectEventClassInfo[i]);
+                MyEventList.Add(FixedEventClassInfo[i]);
             }
             else
             {
                 break;
             }
         }
+
+        // PutMyEventListOnCalenderPage();     // 선택 이벤트 만들어두기
     }
 
     // 선택가능 이벤트 리스트에 정보 넣기
@@ -229,7 +242,9 @@ public class SwitchEventList : MonoBehaviour
     {
         GameObject PossibleEventList;              // 선택가능이벤트들 부모
 
+        m_CancleEventButton.SetActive(false);
         WhiteScreen.SetActive(true);
+
 
         for (int i = 0; i < SelectEventClassInfo.Count; i++)
         {
@@ -280,13 +295,14 @@ public class SwitchEventList : MonoBehaviour
         }
     }
 
+    // 내가 선택가능한 이벤트를 클릭 했을 때 바로옆에 이벤트 설명창에 선택한 이벤트의 정보를 보여주고, 
     public void ShowISelectedPossibleEvent()
     {
         GameObject _NowEvent = EventSystem.current.currentSelectedGameObject;
-        // WhiteScreen.SetActive(false);
-
+        WhiteScreen.SetActive(false);
 
         Debug.Log("이벤트 선택");
+
         for (int i = 0; i < PossibleChooseEventClassList.Count; i++)
         {
             int statArrow = 0;
@@ -299,7 +315,7 @@ public class SwitchEventList : MonoBehaviour
                 if (PossibleChooseEventClassList[i].EventRewardMoney != 0)
                 {
                     m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = "머니";
-                    m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardMoney.ToString();
+                    m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = PossibleChooseEventClassList[i].EventRewardMoney.ToString();
 
                     statArrow += 1;
                 }
@@ -308,8 +324,8 @@ public class SwitchEventList : MonoBehaviour
                 {
                     if (SelectEventClassInfo[i].EventRewardStat[j] != 0)
                     {
-                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStatName[j];
-                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectEventClassInfo[i].EventRewardStat[j].ToString();
+                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = PossibleChooseEventClassList[i].EventRewardStatName[j];
+                        m_EventInfoParent.transform.GetChild(2).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = PossibleChooseEventClassList[i].EventRewardStat[j].ToString();
                     }
                     else
                     {
@@ -317,16 +333,54 @@ public class SwitchEventList : MonoBehaviour
                     }
                     statArrow += 1;
                 }
-
-                // 여기서 임시로 내가 선택한 데이터를 담아둔다
-                IfIChoosedEvent = SelectEventClassInfo[i];
-                EventSchedule.Instance.tempEventList = SelectEventClassInfo[i];
+                //// 여기서 임시로 내가 선택한 데이터를 담아둔다
+                TempIChoosed = PossibleChooseEventClassList[i];
+                EventSchedule.Instance.tempEventList = PossibleChooseEventClassList[i];
                 EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
-
-                Debug.Log(IfIChoosedEvent.EventClassName);
-
             }
         }
+
+
+        if (PrevIChoosedEvent.Count != 0)
+        {
+            int tempI = 0;
+            for (int i = 0; i < PrevIChoosedEvent.Count; i++)
+            {
+                if (_NowEvent.name == PrevIChoosedEvent[i].EventClassName)
+                {
+                    tempI = i;
+                }
+            }
+
+            if (_NowEvent.name == PrevIChoosedEvent[tempI].EventClassName)
+            {
+                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = false;
+                m_CancleEventButton.SetActive(true);
+            }
+            else if (_NowEvent.name != PrevIChoosedEvent[tempI].EventClassName)
+            {
+                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
+                m_CancleEventButton.SetActive(false);
+            }
+
+            for (int i = 0; i < PrevIChoosedEvent.Count; i++)
+            {
+                if (_NowEvent.name == PrevIChoosedEvent[i].EventClassName)
+                {
+                    EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = false;
+                    m_CancleEventButton.SetActive(true);
+
+                    break;
+                }
+                else if (_NowEvent.name != PrevIChoosedEvent[i].EventClassName)
+                {
+                    EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
+                    m_CancleEventButton.SetActive(false);
+                }
+            }
+        }
+
+
         // 이벤트 설명 창을 깔끔하게 안보이게 하다가 내용을 보이게 하기 위해 어거지로 만든 배경
         if (WhiteScreen.activeSelf == true)
         {
@@ -334,14 +388,69 @@ public class SwitchEventList : MonoBehaviour
         }
     }
 
+    // 선택 이벤트 - 내가 전에 선택했던 이벤트들을 모아 둔 리스트에서 삭제하기 /  달력창 정보에서 프리팹 삭제하기
+    public void PushCancleButton()
+    {
+        for (int i = 0; i < PrevIChoosedEvent.Count; i++)
+        {
+            if (PrevIChoosedEvent[i].EventClassName == TempIChoosed.EventClassName)
+            {
+                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
+                PrevIChoosedEvent.RemoveAt(i);
+
+                for(int j = 0; j < m_ParentCalenderScroll.childCount; j++)
+                {
+                    if(m_ParentCalenderScroll.GetChild(j).name == TempIChoosed.EventClassName)
+                    {
+                        MailObjectPool.ReturnFixedEventObject(m_ParentCalenderScroll.GetChild(j).gameObject);
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     // 고정, 선택 이벤트를 첫번째 조건 월에 맞춰 넣었으므로 고정은 바로 달력창의 Scroll View에 넣기
     // 선택은 Possible Scrollview 에 넣기
-    public void SetSelectedEventOnCalender()
+    public void PutMySelectedEventOnCalender()
     {
+        PrevIChoosedEvent.Add(TempIChoosed);        // 여기서 임시로 내가 선택한 데이터를 담아둔다
+
+        // 고정이벤트 넣기
         for (int i = 0; i < PossibleChooseEventClassList.Count; i++)
         {
+            int statArrow = 0;
 
+            m_EventInfoOnCaledner.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = month;       // 해당 월
+            m_EventInfoOnCaledner.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventClassName;      // 선택 이벤트 이름
+            m_EventInfoOnCaledner.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventInformation;    // 선택 이벤트 설명
+
+            if (TempIChoosed.EventRewardMoney != 0)
+            {
+                m_EventInfoOnCaledner.transform.GetChild(4).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = "머니";
+                m_EventInfoOnCaledner.transform.GetChild(4).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventRewardMoney.ToString();
+                statArrow += 1;
+            }
+
+            for (int j = 0; j < TempIChoosed.EventRewardStat.Length; j++)
+            {
+                if (TempIChoosed.EventRewardStat[j] != 0)
+                {
+
+                    m_EventInfoOnCaledner.transform.GetChild(4).GetChild(statArrow).GetChild(0).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventRewardStatName[j];
+                    m_EventInfoOnCaledner.transform.GetChild(4).GetChild(statArrow).GetChild(1).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventRewardStat[j].ToString();
+                    statArrow += 1;
+                }
+                else
+                {
+                    m_EventInfoOnCaledner.transform.GetChild(4).GetChild(statArrow).gameObject.SetActive(false);
+                    statArrow += 1;
+                }
+            }
         }
+
+        // IfIClickEventSetOKButton();
     }
 
     // 오브젝트를 다시 오브젝트 풀에 되돌려 줘야하는데 각각의 큐애 인큐 해야함
@@ -351,10 +460,52 @@ public class SwitchEventList : MonoBehaviour
 
         for (int i = 0; i < _DestroyMailObj; i++)
         {
-            MailObjectPool.ReturnFixedEventObject(m_ParentCalenderScroll.transform.GetChild(i).gameObject);
+            MailObjectPool.ReturnFixedEventObject(m_ParentCalenderScroll.GetChild(i).gameObject);
         }
     }
 
 
-    //  public void 
+    //  선택이벤트 가라를 두개 만들어 둔다 - 이거 아니다!
+    public void PutMyEventListOnCalenderPage()
+    {
+        GameObject SetEventList;
+
+        for (int i = 0; i < 2; i++)
+        {
+            SetEventList = MailObjectPool.GetPossibleEventObject(m_ParentCalenderScroll);
+
+            SetEventList.transform.gameObject.SetActive(false);
+        }
+    }
+
+    public void PutSelectEventOnCalender()
+    {
+        for (int i = 0; i < MyEventList.Count; i++)
+        {
+            if (MyEventList[i].IsFixedEvent == false)
+            {
+                string temp = m_ParentCalenderScroll.GetChild(i).name;
+                if (temp == MyEventList[i].EventClassName)
+                {
+                    m_ParentCalenderScroll.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventDay[2];
+                    m_ParentCalenderScroll.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventDay[3];
+                    m_ParentCalenderScroll.transform.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = FixedEventClassInfo[i].EventClassName;
+                    m_ParentCalenderScroll.transform.GetChild(i).gameObject.SetActive(true);
+                }
+            }
+        }
+    }
+
+    public void IfIGaveTheEventDate()
+    {
+        GameObject SetEventList;
+        SetEventList = MailObjectPool.GetSelectedEventObject(m_ParentCalenderScroll);       //선택한 이벤트 프리팹 생성했으니
+
+        // 선택 이벤트 정보 넣기
+        SetEventList.name = TempIChoosed.EventClassName;
+        SetEventList.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventDay[2];       // 해당 주차
+        SetEventList.transform.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventDay[3];       // 해당 요일
+        SetEventList.transform.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = TempIChoosed.EventClassName;
+    }
 }
+

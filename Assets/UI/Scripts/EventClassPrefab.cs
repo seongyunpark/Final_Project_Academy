@@ -231,7 +231,7 @@ public class EventClassPrefab : MonoBehaviour
                 && FixedEventClassInfo[i].IsPossibleUseEvent)
 
             {
-                EventSchedule.Instance.MyEventList.Add(SelectEventClassInfo[i]);
+                SwitchEventList.Instance.MyEventList.Add(SelectEventClassInfo[i]);
             }
             else
             {
@@ -429,11 +429,11 @@ public class EventClassPrefab : MonoBehaviour
 
                 tempFixed = FixedEventClassInfo[i];
 
-                EventSchedule.Instance.MyEventList.Add(tempFixed);
+                SwitchEventList.Instance.MyEventList.Add(tempFixed);
             }
         }
 
         // 고정 이벤트를 MyEventList에 다 넣어준 뒤 여기서 프리팹을 만들어 둔다
-        EventSchedule.Instance.MakeFixedEventInfoPrefab();
+        // EventSchedule.Instance.MakeFixedEventInfoPrefab();
     }
 }

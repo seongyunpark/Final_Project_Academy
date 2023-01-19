@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using StatData.Runtime;
 
@@ -51,12 +52,13 @@ public class ClassSchedule : MonoBehaviour
     [SerializeField] private GameObject m_SelecteClassArea1;
     [SerializeField] private GameObject m_SelecteClassArea2;
     [SerializeField] private GameObject m_SelecteClassArea3;
-    [SerializeField] private GameObject m_MonthClassSpace;
 
     [SerializeField] private ClassController m_LoadClassData;
     [SerializeField] private ClassPrefab m_ClassPrefab;
     [SerializeField] private TextMeshProUGUI m_ClickClass;
+    [SerializeField] private TextMeshProUGUI m_RegularClass;
     [SerializeField] private SelecteProfessor m_ChangeData;
+    [SerializeField] private Button m_NormalSetting;            // 수업 선택창에 들어오면 기획반부터인걸 보여주기위해
 
     private List<GameObject> m_ManagementSelecteClassName = new List<GameObject>(); // 수업 이름 관리하는 리스트
     private List<GameObject> m_ManagementChoiceButton = new List<GameObject>(); // 지정된 수업의 지정버튼 없애는 리스트
@@ -92,6 +94,7 @@ public class ClassSchedule : MonoBehaviour
 
     void Start()
     {
+        // 내가 가지고 있는 수업들의 목록을 각 파트별로 리스트에 넣어준다.
         for (int i = 0; i < m_LoadClassData.classData.Count; i++)
         {
             if (m_LoadClassData.classData.ElementAt(i).Value.m_ClassType == Type.Art)
@@ -127,6 +130,39 @@ public class ClassSchedule : MonoBehaviour
         m_ManagementChoiceProfessorName.Add(m_ChangeData.m_ProfessorName1);
         m_ManagementChoiceProfessorName.Add(m_ChangeData.m_ProfessorName2);
         m_ManagementChoiceProfessorName.Add(m_ChangeData.m_ProfessorName3);
+
+        m_ClassPrefab.m_SaveData.m_ClassName = "ProductManager";    // 처음 수업 선택에 들어가면 무조건 기획부터이니 셋팅을 해준다.
+    }
+
+    // 새로운 수업을 선택해주기 위해 선택창을 초기화 시켜줄 함수
+    public void ClearClassPanel()
+    {
+        m_NormalSetting.Select();
+
+        m_ClickClass.text = "[기획]반 스케쥴을 정해주세요.";
+
+        for (int i = 0; i < 3; i++)
+        {
+            m_ManagementSelecteClassName[i].SetActive(false);
+            m_ManagementChoiceButton[i].SetActive(true);
+            m_ManagementChoiceProfessorName[i].SetActive(false);
+
+            m_ClassPrefab.m_ArtData[i] = new SaveClassAndProfesssorData();
+            m_ClassPrefab.m_ProductManagerData[i] = new SaveClassAndProfesssorData();
+            m_ClassPrefab.m_ProgrammingData[i] = new SaveClassAndProfesssorData();
+        }
+
+        m_SelecteClassArea1.name = "ProductManagerC_Button" + "1";
+        m_SelecteClassArea2.name = "ProductManagerC_Button" + "2";
+        m_SelecteClassArea3.name = "ProductManagerC_Button" + "3";
+    }
+
+    private void ChangeColorButton()
+    {
+        ColorBlock colorBlock = m_NormalSetting.colors;
+
+        colorBlock.normalColor = new Color(1f, 0f, 0f, 1f);
+        m_NormalSetting.colors = colorBlock;
     }
 
     // 각 클래스의 월별을 정하기 위한 
@@ -147,6 +183,7 @@ public class ClassSchedule : MonoBehaviour
         {
             Debug.Log("기획반");
             m_ClickClass.text = "[기획]반 스케쥴을 정해주세요.";
+            m_RegularClass.text = "기획 정규수업";
             m_SelecteClassArea1.name = gobj.name + "1";
             m_SelecteClassArea2.name = gobj.name + "2";
             m_SelecteClassArea3.name = gobj.name + "3";
@@ -170,6 +207,7 @@ public class ClassSchedule : MonoBehaviour
         {
             Debug.Log("아트반");
             m_ClickClass.text = "[아트]반 스케쥴을 정해주세요.";
+            m_RegularClass.text = "아트 정규수업";
             //GameObject _button = GameObject.Instantiate(m_SelecteClassArea, m_MonthClassSpace.transform);
             m_SelecteClassArea1.name = gobj.name + "1";
             m_SelecteClassArea2.name = gobj.name + "2";
@@ -194,11 +232,12 @@ public class ClassSchedule : MonoBehaviour
         {
             Debug.Log("플밍반");
             m_ClickClass.text = "[프로그래밍]반 스케쥴을 정해주세요.";
+            m_RegularClass.text = "프로그래밍 정규수업";
             //GameObject.Instantiate(m_SelecteClassArea, m_MonthClassSpace.transform);
             m_SelecteClassArea1.name = gobj.name + "1";
             m_SelecteClassArea2.name = gobj.name + "2";
             m_SelecteClassArea3.name = gobj.name + "3";
-            
+
             for (int i = 0; i < 3; i++)
             {
                 if (m_ClassPrefab.m_ProgrammingData[i].m_ClassName != null)

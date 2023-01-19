@@ -260,13 +260,13 @@ public class GameTime : MonoBehaviour
             PrevTime = Time.time;
         }
 
-        // 수업시작 후 반에 도착할 때 까지는 시간이 흐르면 안된다. TimeScale을 멈추면 캐릭터가 움직이지 않으니 다른 방법으로,,
+            // 수업시작 후 반에 도착할 때 까지는 시간이 흐르면 안된다. TimeScale을 멈추면 캐릭터가 움직이지 않으니 다른 방법으로,,
         if (GameTime.Instance.IsGameMode == true && InGameTest.Instance.m_ClassState != ClassState.ClassStart)
         {
             if (Week[WeekIndex] == "첫째 주" || Week[WeekIndex] == "둘째 주")
             {
-                // (1 ~ 2 주차)1초마다 시간체크
-                if (Time.time - PrevTime >= FirstHalfPerSecond)
+            // (1 ~ 2 주차)1초마다 시간체크
+            if (Time.time - PrevTime >= FirstHalfPerSecond)
                 {
                     TimeBarImg.fillAmount += 0.2f;
 

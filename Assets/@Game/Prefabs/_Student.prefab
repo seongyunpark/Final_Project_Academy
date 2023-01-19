@@ -116,7 +116,7 @@ MonoBehaviour:
         byteData: 
         byteDataArray: 
       Version: 
-  gizmoViewMode: 0
+  gizmoViewMode: 2
   showBehaviorDesignerGizmo: 1
 --- !u!1001 &8643904464343387826
 PrefabInstance:

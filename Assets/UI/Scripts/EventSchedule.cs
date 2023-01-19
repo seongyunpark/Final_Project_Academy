@@ -23,7 +23,7 @@ public class EventSchedule : MonoBehaviour
 
     public SaveEventClassData tempEventList;                                // 내가 선택한 날짜를 받기 위한 임시 변수
 
-    public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
+    // public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
 
     [Header("PossibleCountImg")]
     public GameObject _nowPossibleCountImg;
@@ -98,33 +98,6 @@ public class EventSchedule : MonoBehaviour
         }
     }
 
-    public void MakeFixedEventInfoPrefab()
-    {
-        foreach (var MyEventList in MyEventList)
-        {
-            if (MyEventList.IsFixedEvent == true)
-            {
-
-            }
-        }
-    }
-
-    // 선택된 이벤트를 보여준기 위한 목록 프리팹 생성 ( )
-    public void MakeSelectEventInfoPrefab()
-    {
-        foreach (var MyEventList in MyEventList)
-        {
-            if (MyEventList.IsFixedEvent == false &&
-                MyEventList.EventClassName == tempEventList.EventClassName)
-            {
-
-            }
-        }
-    }
-
-    // EventNumber에 따라서 프리팹 정렬이 가능하지 않을까?
-
-
     GameObject _PrevClick = null;           // 이전클릭
     int NowIndex;      // 현재 눌린 달력오브젝트를 알기위한 변수 -> 달력의 현재 눌린 인덱스 (하나의 인덱스를 공유해서 문제 생김)
     int PreIndex = 21;       // 예외처리 해야함 0 값이 되면 버튼 0번이 눌리기 때문에 예외처리 
@@ -143,7 +116,6 @@ public class EventSchedule : MonoBehaviour
             //선택한 이벤트의 현재 년 / 월
             tempEventList.EventDay[0] = GameTime.Instance.FlowTime.NowYear.ToString();
             tempEventList.EventDay[1] = GameTime.Instance.FlowTime.NowMonth;
-
 
             // 클릭한 버튼 - 버튼 이름 비교 . 일치 시 버튼에 현재 이벤트의 이름 띄우기
             for (int i = 0; i < CalenderObj.transform.childCount; i++)
@@ -181,16 +153,14 @@ public class EventSchedule : MonoBehaviour
             Debug.Log(tempEventList.EventDay[2]);
             Debug.Log(tempEventList.EventDay[3]);
         }
-
-
     }
 
-    // 현재 선택 가능한 이벤트 갯수 세는 함수
+    // 현재 선택 가능한 이벤트 갯수 세기, 
     public void CountPossibleEventSetting()
     {
         _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
 
-        MyEventList.Add(tempEventList);
+        SwitchEventList.Instance.MyEventList.Add(tempEventList);
 
         if (nowPossibleCount == 2)
         {
@@ -219,9 +189,9 @@ public class EventSchedule : MonoBehaviour
     {
         _PrevClick = null;      // 이전클릭 초기화시켜주기
 
-        for (int i = 0; i < MyEventList.Count; i++)
+        for (int i = 0; i < SwitchEventList.Instance.MyEventList.Count; i++)
         {
-            if (MyEventList[i].IsFixedEvent == false && tempEventList.EventClassName == MyEventList[i].EventClassName)
+            if (SwitchEventList.Instance.MyEventList[i].IsFixedEvent == false && tempEventList.EventClassName == SwitchEventList.Instance.MyEventList[i].EventClassName)
             {
                 if (PreIndex == 21)
                 {
@@ -229,7 +199,7 @@ public class EventSchedule : MonoBehaviour
                     preEventName = tempEventList.EventClassName;
                 }
 
-                string tempName = MyEventList[i].EventClassName;
+                string tempName = SwitchEventList.Instance.MyEventList[i].EventClassName;
                 CalenderButton[NowIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tempName;
                 CalenderButton[NowIndex].transform.GetComponent<Button>().interactable = false;
             }
@@ -282,10 +252,10 @@ public class EventSchedule : MonoBehaviour
     public void IfIWantCancleEvent()
     {
         // 요소를 삭제 할 때 인덱스의 변화로 인해 무언가 이상이 생길 수 있으므로 - 를 해가며 체크
-        for (int i = MyEventList.Count - 1; i > 0; i--)
+        for (int i = SwitchEventList.Instance.MyEventList.Count - 1; i > 0; i--)
         {
-            if (MyEventList[i].EventClassName == tempEventList.EventClassName
-                && MyEventList[i].IsFixedEvent == false)
+            if (SwitchEventList.Instance.MyEventList[i].EventClassName == tempEventList.EventClassName
+                && SwitchEventList.Instance.MyEventList[i].IsFixedEvent == false)
             {
 
                 if (preEventName == tempEventList.EventClassName)
@@ -325,9 +295,13 @@ public class EventSchedule : MonoBehaviour
                 WhiteScreen.SetActive(true);
 
 
-                MyEventList.Remove(MyEventList[i]);
+                SwitchEventList.Instance.MyEventList.Remove(SwitchEventList.Instance.MyEventList[i]);
             }
         }
+
+        SwitchEventList.Instance.PushCancleButton();
+        // 여기서 선택된 이벤트 목록(2개) 중 현재클릭한 이벤트취소를 한다
+
     }
 
     public void GetSelectedTime(string[] click)

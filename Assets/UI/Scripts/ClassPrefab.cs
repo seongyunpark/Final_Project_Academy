@@ -23,11 +23,11 @@ public class ClassPrefab : MonoBehaviour
     public GameObject m_Prefab;
     public Transform m_parent;
 
-    [SerializeField] private ClassController m_SelecteClass;
-    [SerializeField] private GameObject m_Month1;
-    [SerializeField] private GameObject m_Month2;
-    [SerializeField] private GameObject m_Month3;
-    [SerializeField] private GameObject m_ClassInfo;
+    [SerializeField] private ClassController m_SelecteClass;    // 원하는 수업의 세부내용을 보여주기 위해
+    [SerializeField] private GameObject m_Month1;               // 1번째 칸에 선택한 데이터들을 넣어주기 위해
+    [SerializeField] private GameObject m_Month2;               // 2번째 칸에 선택한 데이터들을 넣어주기 위해
+    [SerializeField] private GameObject m_Month3;               // 3번째 칸에 선택한 데이터들을 넣어주기 위해
+    [SerializeField] private GameObject m_ClassInfo;            // 선택한 반의 수업들을 보여주기 위해
 
     //[SerializeField] private TextMeshProUGUI m_SelecteClassName1;
     //[SerializeField] private TextMeshProUGUI m_SelecteClassName2;
@@ -56,7 +56,7 @@ public class ClassPrefab : MonoBehaviour
     #endregion
 
     private void Start()
-    {
+    { 
         m_ProductManagerData.Capacity = 3;
         m_ArtData.Capacity = 3;
         m_ProgrammingData.Capacity = 3;

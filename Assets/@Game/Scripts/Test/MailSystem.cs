@@ -24,7 +24,7 @@ public class MailSystem : MonoBehaviour
 
         if((GameTime.Instance.WeekIndex == 1 || GameTime.Instance.WeekIndex == 2) && m_IsTurnOnIcon == false)
         {
-            SatisfyRequirement();
+            //SatisfyRequirement();
         }
     }
 

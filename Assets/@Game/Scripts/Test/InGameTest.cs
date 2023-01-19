@@ -40,6 +40,12 @@ public class InGameTest : MonoBehaviour
     [SerializeField]
     private StatController _statController;
 
+    [SerializeField] private ClassPrefab _classPrefab;
+    [SerializeField] private PopOffUI _popOffClassPanel;
+
+    public bool _isRepeatClass = false;                     // 수업 선택 후 3달동안 수업을 실행시키기 위해
+    public int _classCount = 1;                             // 수업을 총 3번만 들을 수 있게 해주기 위한 
+ 
     private List<GameObject> _studentInfoList = new List<GameObject>();
     private List<GameObject> _SelectStudentList = new List<GameObject>();
     private List<Button> _classInfoList = new List<Button>();
@@ -70,11 +76,6 @@ public class InGameTest : MonoBehaviour
 
     private void Awake()
     {
-        //Debug.LogWarning("인게임");
-        //_ProductManagerSeatDic = new Dictionary<string, GameObject>();
-        //_programmingSeatDic = new Dictionary<string, GameObject>();
-        //_artSeatDic = new Dictionary<string, GameObject>();           
-
         if (_instance == null)
         {
             _instance = this;
@@ -360,12 +361,41 @@ public class InGameTest : MonoBehaviour
     // 버튼을 누르면 3달치의 수업을 미리 저장하여 매 달 첫째 주에 m_ClassState가 ClassStart가 될 수 있도록 해주기.
     public void StarClass()
     {
-        //for (int i = 0; i < _startClassStudent.Count; i++)
-        //{
-        //    _startClassStudent[i].m_Doing = Student.Doing.Study;
-        //}
-        //SelectClassAndStudent();
-        //StartCoroutine(EndClass());
+        bool _isSelectClassNotNull = false;
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (_classPrefab.m_ArtData[i].m_ClassName == null ||
+                _classPrefab.m_ProductManagerData[i].m_ClassName == null ||
+                _classPrefab.m_ProgrammingData[i].m_ClassName == null)
+            {
+                _isSelectClassNotNull = false;
+                break;
+            }
+            else
+            {
+                _isSelectClassNotNull = true;
+            }
+        }
+
+        if (_isSelectClassNotNull == true)
+        {
+            m_ClassState = ClassState.ClassStart;
+
+            _isRepeatClass = true;
+
+            foreach (var student in ObjectManager.Instance.m_StudentBehaviorList)
+            {
+                student.GetComponent<Student>().isDesSetting = false;
+            }
+            _popOffClassPanel.TurnOffUI();
+        }
+
+    }
+
+    // 수업 선택이 끝나고 다음달이 되면 실행시켜줄 함수.
+    public void NextClassStart()
+    {
         m_ClassState = ClassState.ClassStart;
 
         foreach (var student in ObjectManager.Instance.m_StudentBehaviorList)
@@ -377,34 +407,12 @@ public class InGameTest : MonoBehaviour
     void StartStudy()
     {
         m_ClassState = ClassState.Studying;
-
-        // 인게임 씬에서만 시간이 체크되도록 체크
-        if (SceneManager.GetActiveScene().name == "InGameScene")
-        {
-            if (GameTime.Instance != null)
-            {
-                GameTime.Instance.IsGameMode = true;
-            }
-            Time.timeScale = 1;
-
-            Debug.Log("시간 흐름");
-        }
-
-        //Invoke("EndClass", 5f);
-
-        //StartCoroutine(EndClass());
     }
 
-    // 3초 후 수업의 숫자만큼 학생의 능력치가 올라가게 해주는 코루틴
+    // 수업이 끝나면 상태를 수업 종료로 바꿔주고 모든 학생들의 상태는 FreeWakl가 가능한 상태로 만들어준다.
+    // 여기서 학생들의 스탯을 수업들은 만큼 올려준다.
     void EndClass()
     {
-        //for (int i = 0; i < _startClassStudent.Count; i++)
-        //{
-        //    _startClassStudent[i].m_Doing = Student.Doing.FreeWalk;
-        //    _statController.CalculateValue(_startClassStudent[i], _startClassMagnitude[i]);
-        //}
-
-        //SelectClassAndStudent();
         m_ClassState = ClassState.ClassEnd;
         foreach (var student in ObjectManager.Instance.m_StudentList)
         {
@@ -412,9 +420,17 @@ public class InGameTest : MonoBehaviour
             student.isDesSetting = false;
         }
 
-        Invoke("StateInit", 5f);
+        // 수업을 3번 반복했으니 이제 다시 수업 셋팅을 할 수 있게 초기화해준다.
+        if (_classCount == 3)
+        {
+            _classCount = 1;
+            _isRepeatClass = false;
+        }
+
+        Invoke("StateInit", 2f);
     }
 
+    // 방금 들은 수업의 정보를 지워준다.
     void StateInit()
     {
         m_ClassState = ClassState.nothing;

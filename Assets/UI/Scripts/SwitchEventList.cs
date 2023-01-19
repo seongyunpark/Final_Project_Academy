@@ -234,7 +234,6 @@ public class SwitchEventList : MonoBehaviour
             }
         }
 
-        // PutMyEventListOnCalenderPage();     // 선택 이벤트 만들어두기
     }
 
     // 선택가능 이벤트 리스트에 정보 넣기
@@ -293,6 +292,8 @@ public class SwitchEventList : MonoBehaviour
             // 선택가능 이벤트 스크롤뷰에서 버튼을 클릭시 지정 함수로 넘어가도록 한다.
             PossibleEventList.GetComponent<Button>().onClick.AddListener(ShowISelectedPossibleEvent);
         }
+
+        EventSchedule.Instance.ShowFixedEventOnCalender();     // 선택 이벤트 만들어두기
     }
 
     // 내가 선택가능한 이벤트를 클릭 했을 때 바로옆에 이벤트 설명창에 선택한 이벤트의 정보를 보여주고, 
@@ -343,26 +344,6 @@ public class SwitchEventList : MonoBehaviour
 
         if (PrevIChoosedEvent.Count != 0)
         {
-            int tempI = 0;
-            for (int i = 0; i < PrevIChoosedEvent.Count; i++)
-            {
-                if (_NowEvent.name == PrevIChoosedEvent[i].EventClassName)
-                {
-                    tempI = i;
-                }
-            }
-
-            if (_NowEvent.name == PrevIChoosedEvent[tempI].EventClassName)
-            {
-                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = false;
-                m_CancleEventButton.SetActive(true);
-            }
-            else if (_NowEvent.name != PrevIChoosedEvent[tempI].EventClassName)
-            {
-                EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
-                m_CancleEventButton.SetActive(false);
-            }
-
             for (int i = 0; i < PrevIChoosedEvent.Count; i++)
             {
                 if (_NowEvent.name == PrevIChoosedEvent[i].EventClassName)
@@ -378,6 +359,11 @@ public class SwitchEventList : MonoBehaviour
                     m_CancleEventButton.SetActive(false);
                 }
             }
+        }
+        else if (PrevIChoosedEvent.Count == 0)
+        {
+            m_CancleEventButton.SetActive(false);
+            EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
         }
 
 
@@ -398,11 +384,11 @@ public class SwitchEventList : MonoBehaviour
                 EventSchedule.Instance.Choose_Button.transform.GetComponent<Button>().interactable = true;
                 PrevIChoosedEvent.RemoveAt(i);
 
-                for(int j = 0; j < m_ParentCalenderScroll.childCount; j++)
+                for (int j = 0; j < m_ParentCalenderScroll.childCount; j++)
                 {
-                    if(m_ParentCalenderScroll.GetChild(j).name == TempIChoosed.EventClassName)
+                    if (m_ParentCalenderScroll.GetChild(j).name == TempIChoosed.EventClassName)
                     {
-                        MailObjectPool.ReturnFixedEventObject(m_ParentCalenderScroll.GetChild(j).gameObject);
+                        MailObjectPool.ReturnSelectedEventObject(m_ParentCalenderScroll.GetChild(j).gameObject);
 
                         break;
                     }

@@ -7,7 +7,7 @@ using TMPro;
 
 public enum eMonth
 {
-    January,
+    January = 0,
     February,
     March, 
     April,
@@ -23,7 +23,7 @@ public enum eMonth
 
 public enum eWeek
 {
-    Week1,
+    Week1 = 0,
     Week2,
     Week3,
     Week4
@@ -31,7 +31,7 @@ public enum eWeek
 
 public enum eDate
 {
-    Monday,
+    Monday = 0,
     Tuesday,
     Wednsday,
     Thursday,

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 
 /// <summary>
@@ -269,6 +270,8 @@ public class EventSchedule : MonoBehaviour
                     CalenderButton[NowIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
                 }
 
+                // CountPossibleEventSetting();
+
                 if (nowPossibleCount == 1)          // 이벤트 하나만 있을 때
                 {
                     _nowPossibleCountImg.transform.GetChild(1).gameObject.SetActive(true);
@@ -281,6 +284,7 @@ public class EventSchedule : MonoBehaviour
                 else if (nowPossibleCount == 0)     // 이벤트 2개 다 차있을때
                 {
                     _nowPossibleCountImg.transform.GetChild(0).gameObject.SetActive(true);
+                    _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(false);
                 }
 
                 ShowSelectedEventSettingOKButton();
@@ -346,14 +350,25 @@ public class EventSchedule : MonoBehaviour
         }
     }
 
-    // 이벤트선택 창에서 선택완료 라는 버튼을 누르면 고정이벤트가 뜬 상태로 뜨게 하기
-    // 아니면 그냥 뜨게 하기? 이건 얘기해보기
+    // 이번달의 고정이벤트를 달력에 미리 넣기
+    // 
     public void ShowFixedEventOnCalender()
     {
+        int WeekIndex = 0;
+        int DayIndex = 0;
 
+        for (int i = 0; i < SwitchEventList.Instance.MyEventList.Count; i++)
+        {
+            if(SwitchEventList.Instance.MyEventList[i].IsFixedEvent == true)
+            {
+                WeekIndex = Array.IndexOf(GameTime.Instance.Week, SwitchEventList.Instance.MyEventList[i].EventDay[2]);
+                DayIndex = Array.IndexOf(GameTime.Instance.Day, SwitchEventList.Instance.MyEventList[i].EventDay[3]);
+
+                CalenderButton[(WeekIndex * 5) + DayIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SwitchEventList.Instance.MyEventList[i].EventClassName;
+                //if(SwitchEventList.Instance.MyEventList[i].EventDay[2]  == "첫째 주")       //주
+                CalenderButton[(WeekIndex * 5) + DayIndex].GetComponent<Button>().interactable = false;
+            }
+        }
     }
 
-
-    // 달력 버튼 눌렀을 때 그 달의 일정을 보여주는 달력창을 만들어야 한다
-    // 만들어둔 달력 체크 화면의 것을 옮겨다가 보여주고, 다시 끄면 원래 곳으로 옮겨주고
 }

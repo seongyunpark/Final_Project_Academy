@@ -1,157 +1,82 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
+using UnityEngine.UI;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
-using GooglePlayGames.BasicApi.SavedGame;
-using GooglePlayGames.BasicApi.Events;
-
-
-public class GPGSBinder
+using Firebase.Auth;
+ 
+public class GPGSBinder : MonoBehaviour
 {
-    static GPGSBinder inst = new GPGSBinder();
-    public static GPGSBinder Inst => inst;
-
-
-
-    ISavedGameClient SavedGame => 
-        PlayGamesPlatform.Instance.SavedGame;
-
-    IEventsClient Events =>
-        PlayGamesPlatform.Instance.Events;
-
-
-
-    void Init()
+    private FirebaseAuth auth;
+ 
+    void Start()
     {
-        var config = new PlayGamesClientConfiguration.Builder().EnableSavedGames().Build();
-        PlayGamesPlatform.InitializeInstance(config);
+        PlayGamesPlatform.InitializeInstance(new PlayGamesClientConfiguration.Builder()
+            .RequestIdToken()
+            .RequestEmail()
+            .Build());
         PlayGamesPlatform.DebugLogEnabled = true;
         PlayGamesPlatform.Activate();
+        // 구글 플레이 게임 활성화
+ 
+        auth = FirebaseAuth.DefaultInstance; // Firebase 액세스
     }
-
-
-    public void Login(Action<bool, UnityEngine.SocialPlatforms.ILocalUser> onLoginSuccess = null)
+ 
+ 
+    public void TryGoogleLogin()
     {
-        Init();
-        PlayGamesPlatform.Instance.Authenticate(SignInInteractivity.CanPromptAlways, (success) =>
+        if (!Social.localUser.authenticated) // 로그인 되어 있지 않다면
         {
-            onLoginSuccess?.Invoke(success == SignInStatus.Success, Social.localUser);
-        });
-    }
-
-    public void Logout()
-    {
-        PlayGamesPlatform.Instance.SignOut();
-    }
-
-
-    public void SaveCloud(string fileName, string saveData, Action<bool> onCloudSaved = null)
-    {
-        SavedGame.OpenWithAutomaticConflictResolution(fileName, DataSource.ReadCacheOrNetwork,
-            ConflictResolutionStrategy.UseLastKnownGood, (status, game) =>
+            Social.localUser.Authenticate(success => // 로그인 시도
             {
-                if (status == SavedGameRequestStatus.Success)
+                if (success) // 성공하면
                 {
-                    var update = new SavedGameMetadataUpdate.Builder().Build();
-                    byte[] bytes = System.Text.Encoding.UTF8.GetBytes(saveData);
-                    SavedGame.CommitUpdate(game, update, bytes, (status2, game2) =>
-                    {
-                        onCloudSaved?.Invoke(status2 == SavedGameRequestStatus.Success);
-                    });
+                    Debug.Log("Success");
+                    StartCoroutine(TryFirebaseLogin()); // Firebase Login 시도
+                }
+                else // 실패하면
+                {
+                    Debug.Log("Fail");
                 }
             });
+        }
     }
-
-    public void LoadCloud(string fileName, Action<bool, string> onCloudLoaded = null)
+ 
+ 
+    public void TryGoogleLogout()
     {
-        SavedGame.OpenWithAutomaticConflictResolution(fileName, DataSource.ReadCacheOrNetwork, 
-            ConflictResolutionStrategy.UseLastKnownGood, (status, game) => 
+        if (Social.localUser.authenticated) // 로그인 되어 있다면
+        {
+            PlayGamesPlatform.Instance.SignOut(); // Google 로그아웃
+            auth.SignOut(); // Firebase 로그아웃
+            
+            Debug.Log("로그아웃");
+        }
+    }
+ 
+ 
+    IEnumerator TryFirebaseLogin()
+    {
+        while (string.IsNullOrEmpty(((PlayGamesLocalUser)Social.localUser).GetIdToken()))
+            yield return null;
+        string idToken = ((PlayGamesLocalUser)Social.localUser).GetIdToken();
+ 
+ 
+        Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
+        auth.SignInWithCredentialAsync(credential).ContinueWith(task => {
+            if (task.IsCanceled)
             {
-                if (status == SavedGameRequestStatus.Success)
-                {
-                    SavedGame.ReadBinaryData(game, (status2, loadedData) =>
-                    {
-                        if (status2 == SavedGameRequestStatus.Success)
-                        {
-                            string data = System.Text.Encoding.UTF8.GetString(loadedData);
-                            onCloudLoaded?.Invoke(true, data);
-                        }
-                        else
-                            onCloudLoaded?.Invoke(false, null);
-                    });
-                }
-            });
-    }
-
-    public void DeleteCloud(string fileName, Action<bool> onCloudDeleted = null)
-    {
-        SavedGame.OpenWithAutomaticConflictResolution(fileName,
-            DataSource.ReadCacheOrNetwork, ConflictResolutionStrategy.UseLongestPlaytime, (status, game) =>
+                Debug.LogError("SignInWithCredentialAsync was canceled.");
+                return;
+            }
+            if (task.IsFaulted)
             {
-                if (status == SavedGameRequestStatus.Success)
-                {
-                    SavedGame.Delete(game);
-                    onCloudDeleted?.Invoke(true);
-                }
-                else 
-                    onCloudDeleted?.Invoke(false);
-            });
-    }
-
-
-    public void ShowAchievementUI() => 
-        Social.ShowAchievementsUI();
-
-	public void UnlockAchievement(string gpgsId, Action<bool> onUnlocked = null) => 
-        Social.ReportProgress(gpgsId, 100, success => onUnlocked?.Invoke(success));
-
-    public void IncrementAchievement(string gpgsId, int steps, Action<bool> onUnlocked = null) =>
-        PlayGamesPlatform.Instance.IncrementAchievement(gpgsId, steps, success => onUnlocked?.Invoke(success));
-
-
-    public void ShowAllLeaderboardUI() =>
-        Social.ShowLeaderboardUI();
-
-    public void ShowTargetLeaderboardUI(string gpgsId) => 
-        ((PlayGamesPlatform)Social.Active).ShowLeaderboardUI(gpgsId);
-
-    public void ReportLeaderboard(string gpgsId, long score, Action<bool> onReported = null) =>
-        Social.ReportScore(score, gpgsId, success => onReported?.Invoke(success));
-
-	public void LoadAllLeaderboardArray(string gpgsId, Action<UnityEngine.SocialPlatforms.IScore[]> onloaded = null) => 
-        Social.LoadScores(gpgsId, onloaded);
-
-    public void LoadCustomLeaderboardArray(string gpgsId, int rowCount, LeaderboardStart leaderboardStart, 
-        LeaderboardTimeSpan leaderboardTimeSpan, Action<bool, LeaderboardScoreData> onloaded = null)
-    {
-        PlayGamesPlatform.Instance.LoadScores(gpgsId, leaderboardStart, rowCount, LeaderboardCollection.Public, leaderboardTimeSpan, data =>
-        {
-            onloaded?.Invoke(data.Status == ResponseStatus.Success, data);
+                Debug.LogError("SignInWithCredentialAsync encountered an error: " + task.Exception);
+                return;
+            }
+ 
+            Debug.Log("Success!");
         });
     }
-
-
-    public void IncrementEvent(string gpgsId, uint steps) 
-    {
-        Events.IncrementEvent(gpgsId, steps);
-    }
-
-    public void LoadEvent(string gpgsId, Action<bool, IEvent> onEventLoaded = null)
-    {
-        Events.FetchEvent(DataSource.ReadCacheOrNetwork, gpgsId, (status, iEvent) =>
-        {
-            onEventLoaded?.Invoke(status == ResponseStatus.Success, iEvent);
-        });
-    }
-
-    public void LoadAllEvent(Action<bool, List<IEvent>> onEventsLoaded = null)
-    {
-        Events.FetchAllEvents(DataSource.ReadCacheOrNetwork, (status, events) =>
-        {
-            onEventsLoaded?.Invoke(status == ResponseStatus.Success, events);
-        });
-    }
-
 }

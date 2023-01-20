@@ -38,20 +38,20 @@ public class Student : MonoBehaviour
 
     public int m_RestaurantNumOfPeople;
 
-    public string m_Destination = " ";
+    public string m_Roll;
 
     public Queue<string> m_DestinationQueue = new Queue<string>();
 
     void Update()
     {
-        m_Time += Time.deltaTime;
+        //m_Time += Time.deltaTime;
 
-        if (m_Time > m_CoolTime)
-        {
-            m_Time = 0f;
-            //Debug.Log(m_Node);
-            //m_Node.Run();
-        }
+        //if (m_Time > m_CoolTime)
+        //{
+        //    m_Time = 0f;
+        //    //Debug.Log(m_Node);
+        //    //m_Node.Run();
+        //}
     }
 
     public void Initialize(StudentStat _stat ,string _name, StudentCondition _studentCondition)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System.Linq;
@@ -42,10 +43,13 @@ public class InGameTest : MonoBehaviour
 
     [SerializeField] private ClassPrefab _classPrefab;
     [SerializeField] private PopOffUI _popOffClassPanel;
+    [SerializeField] private Button m_ChangeColorArtButton;
+    [SerializeField] private Button m_ChangeColorProductManagerButton;
+    [SerializeField] private Button m_ChangeColorProgrammingButton;
 
     public bool _isRepeatClass = false;                     // 수업 선택 후 3달동안 수업을 실행시키기 위해
     public int _classCount = 1;                             // 수업을 총 3번만 들을 수 있게 해주기 위한 
- 
+
     private List<GameObject> _studentInfoList = new List<GameObject>();
     private List<GameObject> _SelectStudentList = new List<GameObject>();
     private List<Button> _classInfoList = new List<Button>();
@@ -58,7 +62,7 @@ public class InGameTest : MonoBehaviour
     //public Dictionary<string, GameObject> _ProductManagerSeatDic;
     //public Dictionary<string, GameObject> _artSeatDic;
 
-    public List<string> _interactionScript = new List<string>();
+    public List<string> _interactionScript;
 
     public ClassState m_ClassState = ClassState.nothing;
 
@@ -89,7 +93,7 @@ public class InGameTest : MonoBehaviour
 
     private void Start()
     {
-        if (_interactionScript == null)
+        if (_interactionScript.Count == 0)
         {
             InteractionScriptSetting();
         }
@@ -103,7 +107,7 @@ public class InGameTest : MonoBehaviour
             {
                 if (student.isArrivedClass == false)
                 {
-                    m_ClassState = ClassState.ClassStart;
+                     m_ClassState = ClassState.ClassStart;
                     break;
                 }
 
@@ -389,6 +393,10 @@ public class InGameTest : MonoBehaviour
                 student.GetComponent<Student>().isDesSetting = false;
             }
             _popOffClassPanel.TurnOffUI();
+
+            ClassSchedule.Instance.ChangeColorButton(m_ChangeColorArtButton, Color.white);
+            ClassSchedule.Instance.ChangeColorButton(m_ChangeColorProductManagerButton, Color.white);
+            ClassSchedule.Instance.ChangeColorButton(m_ChangeColorProgrammingButton, Color.white);
         }
 
     }
@@ -418,6 +426,8 @@ public class InGameTest : MonoBehaviour
         {
             student.isArrivedClass = false;
             student.isDesSetting = false;
+            student.GetComponent<NavMeshAgent>().obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
+
         }
 
         // 수업을 3번 반복했으니 이제 다시 수업 셋팅을 할 수 있게 초기화해준다.

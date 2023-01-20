@@ -73,6 +73,7 @@ public class Destination : Conditional
                 {
                     // 수업이 아닌 특정 목적지를 도착했을 때 이동하는 걸로 변경하기
                     gameObject.GetComponent<Student>().isDesSetting = false;
+
                     if (m_NowDestination == "ClassSeat")
                     {
                         m_NowDestination = " ";

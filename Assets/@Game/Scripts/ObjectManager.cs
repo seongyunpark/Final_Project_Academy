@@ -168,6 +168,7 @@ public class ObjectManager : MonoBehaviour
         studentTreeInstance.SetVariableValue("FreeWalk1", "FreeWalk1");
         studentTreeInstance.SetVariableValue("FreeWalk2", "FreeWalk2");
         studentTreeInstance.SetVariableValue("FreeWalk3", "FreeWalk3");
+        studentTreeInstance.SetVariableValue("StudentTag", _newStudentObject.tag);
 
         _newStudentObject.GetComponent<BehaviorTree>().ExternalBehavior = studentTreeInstance;
         _newStudentObject.GetComponent<BehaviorTree>().EnableBehavior();

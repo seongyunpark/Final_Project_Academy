@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.AI;
 using BehaviorDesigner.Runtime;
 using BehaviorDesigner.Runtime.Tasks;
 
@@ -40,11 +41,13 @@ public class CheckClass : Conditional
         gameObject.GetComponent<Student>().m_DestinationQueue.Enqueue("ClassSeat");
         gameObject.GetComponent<Student>().isDesSetting = true;
         isClassDesSetting = true;
+        gameObject.GetComponent<NavMeshAgent>().obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
     }
 
     void SetClassEndDestination()
     {
         gameObject.GetComponent<Student>().m_DestinationQueue.Clear();
+        //gameObject.GetComponent<NavMeshAgent>().obstacleAvoidanceType = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
 
         int _rand = Random.Range(0, 3);
 

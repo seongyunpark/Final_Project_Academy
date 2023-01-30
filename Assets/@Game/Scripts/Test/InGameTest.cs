@@ -66,6 +66,9 @@ public class InGameTest : MonoBehaviour
 
     public ClassState m_ClassState = ClassState.nothing;
 
+    public bool _isSelectClassNotNull = false;
+
+
     public static InGameTest Instance
     {
         get
@@ -107,7 +110,7 @@ public class InGameTest : MonoBehaviour
             {
                 if (student.isArrivedClass == false)
                 {
-                     m_ClassState = ClassState.ClassStart;
+                    m_ClassState = ClassState.ClassStart;
                     break;
                 }
 
@@ -122,7 +125,7 @@ public class InGameTest : MonoBehaviour
 
         if (m_ClassState == ClassState.Studying)
         {
-            if (GameTime.Instance.FlowTime.NowWeek == "셋째 주")
+            if (GameTime.Instance.FlowTime.NowWeek == 3)
             {
                 EndClass();
             }
@@ -282,90 +285,90 @@ public class InGameTest : MonoBehaviour
         switch (_class.m_ClassType)
         {
             case Type.Art:
-            {
-                for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                 {
-                    if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.Art)
+                    for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                     {
-                        var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
-                        newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
-                        _SelectStudentList.Add(newStatsBox);
-                        _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
+                        if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.Art)
+                        {
+                            var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
+                            newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
+                            _SelectStudentList.Add(newStatsBox);
+                            _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
 
-                        statModifier = new StatModifier();
+                            statModifier = new StatModifier();
 
-                        statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
 
-                        _startClassMagnitude.Add(statModifier);
+                            _startClassMagnitude.Add(statModifier);
+                        }
                     }
-                }
-                SelectClassAndStudent();
+                    SelectClassAndStudent();
 
-                Debug.Log("아트");
-            }
-            break;
+                    Debug.Log("아트");
+                }
+                break;
 
             case Type.ProductManager:
-            {
-                for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                 {
-                    if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.ProductManager)
+                    for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                     {
-                        var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
-                        newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
-                        _SelectStudentList.Add(newStatsBox);
-                        _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
+                        if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.ProductManager)
+                        {
+                            var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
+                            newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
+                            _SelectStudentList.Add(newStatsBox);
+                            _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
 
-                        statModifier = new StatModifier();
+                            statModifier = new StatModifier();
 
-                        statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
 
-                        _startClassMagnitude.Add(statModifier);
+                            _startClassMagnitude.Add(statModifier);
+                        }
                     }
+                    SelectClassAndStudent();
+
+                    Debug.Log("기획");
+
                 }
-                SelectClassAndStudent();
-
-                Debug.Log("기획");
-
-            }
-            break;
+                break;
 
             case Type.Programming:
-            {
-                for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                 {
-                    if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.Programming)
+                    for (int i = 0; i < ObjectManager.Instance.m_StudentList.Count; i++)
                     {
-                        var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
-                        newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
-                        _SelectStudentList.Add(newStatsBox);
-                        _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
+                        if (ObjectManager.Instance.m_StudentList[i].m_StudentData.m_StudentType == Type.Programming)
+                        {
+                            var newStatsBox = Instantiate(_studentStatBox, new Vector3(0, 0, 0), Quaternion.identity);
+                            newStatsBox.transform.SetParent(GameObject.Find("StudentContent").transform);
+                            _SelectStudentList.Add(newStatsBox);
+                            _startClassStudent.Add(ObjectManager.Instance.m_StudentList[i]);
 
-                        statModifier = new StatModifier();
+                            statModifier = new StatModifier();
 
-                        statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
-                        statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.System] = _CheckClass[_class.m_ClassName].m_ClassSystemValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Contents] = _CheckClass[_class.m_ClassName].m_ClassContentsValue;
+                            statModifier.StatsModifierInfo[ModifierStatType.Balance] = _CheckClass[_class.m_ClassName].m_ClassBalanceValue;
 
-                        _startClassMagnitude.Add(statModifier);
+                            _startClassMagnitude.Add(statModifier);
+                        }
                     }
-                }
-                SelectClassAndStudent();
+                    SelectClassAndStudent();
 
-                Debug.Log("프로그래밍");
-            }
-            break;
+                    Debug.Log("프로그래밍");
+                }
+                break;
         }
     }
 
     // 버튼을 누르면 3달치의 수업을 미리 저장하여 매 달 첫째 주에 m_ClassState가 ClassStart가 될 수 있도록 해주기.
     public void StarClass()
     {
-        bool _isSelectClassNotNull = false;
+        _isSelectClassNotNull = false;
 
         for (int i = 0; i < 3; i++)
         {

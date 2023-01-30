@@ -30,9 +30,9 @@ public class Interaction : Action
 
     public void ScriptPlay()
     {
-        Debug.Log(InGameTest.Instance._interactionScript[0]);
-        Debug.Log(InGameTest.Instance._interactionScript[1]);
-        Debug.Log(InGameTest.Instance._interactionScript[2]);
+        // Debug.Log(InGameTest.Instance._interactionScript[0]);
+        // Debug.Log(InGameTest.Instance._interactionScript[1]);
+        // Debug.Log(InGameTest.Instance._interactionScript[2]);
 
         m_IsPlaying = false;
     }

@@ -22,31 +22,32 @@ public class EventSchedule : MonoBehaviour
     // 이 버튼의 존재 의의 -> 고정 이벤트의 정보를 먼저 담아놓기 위한 버튼 
     public List<GameObject> CalenderButton = new List<GameObject>();        // 달력 오브젝트 넣은 달력버튼 리스트
 
-    public SaveEventClassData tempEventList;                                // 내가 선택한 날짜를 받기 위한 임시 변수
+    public SaveEventData tempEventList;                                // 내가 선택한 날짜를 받기 위한 임시 변수
 
     // public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
 
-    [Header("PossibleCountImg")]
-    public GameObject _nowPossibleCountImg;
+    [Header("PossibleCountImg")] public GameObject _nowPossibleCountImg;
 
     [Space(10f)]
     [Header("Buttons")]
     public GameObject Choose_Button;
     public GameObject SetOK_Button;
 
-    [Header("EventInfoWhiteScreen")]
-    public GameObject WhiteScreen;
+    public GameObject Go_Button;
+    public GameObject Go_Button_1;
+
+    [Header("EventInfoWhiteScreen")] public GameObject WhiteScreen;
 
     [Space(10f)]
     [Header("SelectdEvent&SetOkEvent")]
     public GameObject RewardInfoScreen;
     public GameObject MonthOfRewardInfoScreen;
 
-    const int PossibleSetCount = 2;      // 최대 이벤트 지정 가능 횟수
-    [Space(10f)]
-    public int nowPossibleCount = 2;            // 현재 이벤트가능횟수
+    [Space(10f)] public GameObject CalenderMonthText;
+    public GameObject CalenderMonthText_1;
 
-
+    const int PossibleSetCount = 2;                         // 최대 이벤트 지정 가능 횟수
+    [Space(10f)] public int nowPossibleCount = 2;           // 현재 이벤트가능횟수
 
     public static EventSchedule Instance
     {
@@ -115,8 +116,8 @@ public class EventSchedule : MonoBehaviour
         if (tempEventList != null)
         {
             //선택한 이벤트의 현재 년 / 월
-            tempEventList.EventDay[0] = GameTime.Instance.FlowTime.NowYear.ToString();
-            tempEventList.EventDay[1] = GameTime.Instance.FlowTime.NowMonth;
+            // tempEventList.EventDate[2] = _NowClick;
+            // tempEventList.EventDate[3] = GameTime.Instance.FlowTime.NowMonth;
 
             // 클릭한 버튼 - 버튼 이름 비교 . 일치 시 버튼에 현재 이벤트의 이름 띄우기
             for (int i = 0; i < CalenderObj.transform.childCount; i++)
@@ -149,39 +150,42 @@ public class EventSchedule : MonoBehaviour
                 // PreIndex = NowIndex;
             }
 
-            Debug.Log(tempEventList.EventDay[0]);
-            Debug.Log(tempEventList.EventDay[1]);
-            Debug.Log(tempEventList.EventDay[2]);
-            Debug.Log(tempEventList.EventDay[3]);
+            Debug.Log(tempEventList.EventDate[0]);
+            Debug.Log(tempEventList.EventDate[1]);
+            Debug.Log(tempEventList.EventDate[2]);
+            Debug.Log(tempEventList.EventDate[3]);
         }
     }
 
     // 현재 선택 가능한 이벤트 갯수 세기, 
     public void CountPossibleEventSetting()
     {
-        _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
-
-        SwitchEventList.Instance.MyEventList.Add(tempEventList);
-
-        if (nowPossibleCount == 2)
+        if (tempEventList.EventDate[2] != 0)
         {
-            _nowPossibleCountImg.transform.GetChild(1).gameObject.SetActive(false);
-        }
-        else if (nowPossibleCount == 1)
-        {
-            _nowPossibleCountImg.transform.GetChild(0).gameObject.SetActive(false);
-        }
+            _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
 
-        nowPossibleCount -= 1;
+            SwitchEventList.Instance.MyEventList.Add(tempEventList);
 
-        SaveEventOnCalender();
+            if (nowPossibleCount == 2)
+            {
+                _nowPossibleCountImg.transform.GetChild(1).gameObject.SetActive(false);
+            }
+            else if (nowPossibleCount == 1)
+            {
+                _nowPossibleCountImg.transform.GetChild(0).gameObject.SetActive(false);
+            }
 
-        if (nowPossibleCount == 0)
-        {
-            Choose_Button.transform.GetComponent<Button>().interactable = false;
-            _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(true);
-            Debug.Log("이제 선택 못함");
-            //ShowSelectedEventSettingOKButton();
+            nowPossibleCount -= 1;
+
+            SaveEventOnCalender();
+
+            if (nowPossibleCount == 0)
+            {
+                Choose_Button.transform.GetComponent<Button>().interactable = false;
+                _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(true);
+                Debug.Log("이제 선택 못함");
+                //ShowSelectedEventSettingOKButton();
+            }
         }
     }
 
@@ -209,29 +213,28 @@ public class EventSchedule : MonoBehaviour
 
     public void IfClickBackButton()
     {
-        for (int i = 0; i < SwitchEventList.Instance.PrevIChoosedEvent.Count; i++)      // 달력 내 버튼 클릭 후 뒤로 버튼 클릭 시 여기서 이전클릭 정보를 없애줘야 오류 안생김
-        {
-            if (SwitchEventList.Instance.PrevIChoosedEvent[i].EventDay[2] != null)
-            {
-                SwitchEventList.Instance.PrevIChoosedEvent.RemoveAt(i);
-            }
-        }
-
         if (_PrevClick != null)
         {
             _PrevClick.SetActive(true);
             _PrevClick.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+
             WhiteScreen.SetActive(true);
-            tempEventList = null;
+            tempEventList.EventDate[2] = 0;
+            tempEventList.EventDate[3] = 0;
             Choose_Button.transform.GetComponent<Button>().interactable = false;
             _PrevClick = null;
         }
         else
         {
             WhiteScreen.SetActive(true);
-            tempEventList = null;
+
+            if (tempEventList != null)
+            {
+                tempEventList.EventDate[2] = 0;
+                tempEventList.EventDate[3] = 0;
+            }
+
             Choose_Button.transform.GetComponent<Button>().interactable = false;
-            _PrevClick = null;
         }
     }
 
@@ -244,24 +247,24 @@ public class EventSchedule : MonoBehaviour
         {
             RewardInfoScreen.SetActive(true);
             MonthOfRewardInfoScreen.SetActive(false);
+            Go_Button.SetActive(true);
+            Go_Button_1.SetActive(false);
         }
         else if (_NowClick.name == SetOK_Button.name)
         {
             tempEventList = null;
             RewardInfoScreen.SetActive(false);
             MonthOfRewardInfoScreen.SetActive(true);
+            Go_Button.SetActive(false);
+            Go_Button_1.SetActive(true);
         }
     }
 
-    // 취소는 현재 내가 누른 이벤트목록의 이벤트와 달력의 정보를 알 수 없으므로 작동하지 않음
-    // 조건과 데이터를 더 잘 연결해서 만들면 될듯
-    // 고정이벤트는 리스트에 들어가고, 현재 리스트에서 고정 키워드를 찾아 달력에 그려주면 그려질듯
-    // 선택 이벤트 두개가 선택되면 더이상 버튼이 눌리지 않고, 이벤트 취소를 누르면 횟수가 돌아오고,
-    // 이렇게 작동하도록 하자
+    // 선택 이벤트만 있을때 취소 안되던 문제 해결 -> for문에 >= 0 이어야 전부 확인하는데 > 0 이었어서 들어가지 않아서 일어나는 문제였음
     public void IfIWantCancleEvent()
     {
         // 요소를 삭제 할 때 인덱스의 변화로 인해 무언가 이상이 생길 수 있으므로 - 를 해가며 체크
-        for (int i = SwitchEventList.Instance.MyEventList.Count - 1; i > 0; i--)
+        for (int i = SwitchEventList.Instance.MyEventList.Count - 1; i >= 0; i--)
         {
             if (SwitchEventList.Instance.MyEventList[i].EventClassName == tempEventList.EventClassName
                 && SwitchEventList.Instance.MyEventList[i].IsFixedEvent == false)
@@ -321,40 +324,40 @@ public class EventSchedule : MonoBehaviour
         //주 구분
         if (click[0] == "1")
         {
-            tempEventList.EventDay[2] = GameTime.Instance.Week[0];
+            tempEventList.EventDate[2] = 1;
         }
         else if (click[0] == "2")
         {
-            tempEventList.EventDay[2] = GameTime.Instance.Week[1];
+            tempEventList.EventDate[2] = 2;
         }
         else if (click[0] == "3")
         {
-            tempEventList.EventDay[2] = GameTime.Instance.Week[2];
+            tempEventList.EventDate[2] = 3;
         }
         else if (click[0] == "4")
         {
-            tempEventList.EventDay[2] = GameTime.Instance.Week[3];
+            tempEventList.EventDate[2] = 4;
         }
         // 요일 구분
         if (click[1] == "Monday")
         {
-            tempEventList.EventDay[3] = GameTime.Instance.Day[0];
+            tempEventList.EventDate[3] = 1;
         }
         else if (click[1] == "Tuesday")
         {
-            tempEventList.EventDay[3] = GameTime.Instance.Day[1];
+            tempEventList.EventDate[3] = 2;
         }
         else if (click[1] == "Wednsday")
         {
-            tempEventList.EventDay[3] = GameTime.Instance.Day[2];
+            tempEventList.EventDate[3] = 3;
         }
         else if (click[1] == "Thursday")
         {
-            tempEventList.EventDay[3] = GameTime.Instance.Day[3];
+            tempEventList.EventDate[3] = 4;
         }
         else if (click[1] == "Friday")
         {
-            tempEventList.EventDay[3] = GameTime.Instance.Day[4];
+            tempEventList.EventDate[3] = 5;
         }
     }
 
@@ -369,8 +372,8 @@ public class EventSchedule : MonoBehaviour
         {
             if (SwitchEventList.Instance.MyEventList[i].IsFixedEvent == true)
             {
-                WeekIndex = Array.IndexOf(GameTime.Instance.Week, SwitchEventList.Instance.MyEventList[i].EventDay[2]);
-                DayIndex = Array.IndexOf(GameTime.Instance.Day, SwitchEventList.Instance.MyEventList[i].EventDay[3]);
+                WeekIndex = SwitchEventList.Instance.MyEventList[i].EventDate[2] - 1;
+                DayIndex = SwitchEventList.Instance.MyEventList[i].EventDate[3] - 1;
 
                 CalenderButton[(WeekIndex * 5) + DayIndex].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SwitchEventList.Instance.MyEventList[i].EventClassName;
                 //if(SwitchEventList.Instance.MyEventList[i].EventDay[2]  == "첫째 주")       //주
@@ -379,5 +382,27 @@ public class EventSchedule : MonoBehaviour
         }
     }
 
+    // 이벤트 -> 한 달이 지날 때 모든 조건을 리셋해 줄 함수들
+    public void ResetPossibleCount()
+    {
+        nowPossibleCount = 2;
 
+        _nowPossibleCountImg.transform.GetChild(0).gameObject.SetActive(true);
+        _nowPossibleCountImg.transform.GetChild(1).gameObject.SetActive(true);
+        _nowPossibleCountImg.transform.GetChild(2).gameObject.SetActive(false);
+
+        for (int i = 0; i < CalenderButton.Count; i++)
+        {
+            CalenderButton[i].transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+            CalenderButton[i].GetComponent<Button>().interactable = true;
+        }
+
+        SwitchEventList.Instance.MyEventList.Clear();
+    }
+
+    public void SetEventCalenderMonthText()
+    {
+        CalenderMonthText.transform.GetComponent<TextMeshProUGUI>().text = GameTime.Instance.FlowTime.NowMonth.ToString();
+        CalenderMonthText_1.transform.GetComponent<TextMeshProUGUI>().text = GameTime.Instance.FlowTime.NowMonth.ToString();
+    }
 }

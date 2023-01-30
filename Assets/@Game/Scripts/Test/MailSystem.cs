@@ -22,7 +22,7 @@ public class MailSystem : MonoBehaviour
             m_IsTurnOnIcon = false;
         }
 
-        if ((GameTime.Instance.WeekIndex == 1 || GameTime.Instance.WeekIndex == 2) && GameTime.Instance.MonthIndex == 2 && m_IsTurnOnIcon == false)
+        if ((GameTime.Instance.FlowTime.NowWeek == 1 || GameTime.Instance.FlowTime.NowWeek == 2) && GameTime.Instance.FlowTime.NowWeek == 2 && m_IsTurnOnIcon == false)
         {
             SatisfyRequirement();
         }

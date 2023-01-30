@@ -30,6 +30,8 @@ public class LoginInfo : MonoBehaviour
 
     private bool isLoginSuccess = false;
 
+    [SerializeField] PopUpUI PopUpSetAcademyNamePanel;          // 구글 로그인 시 띄워줄 팝업 유아이
+
     public string ServerStr
     {
         get { return serverStr; }
@@ -53,16 +55,18 @@ public class LoginInfo : MonoBehaviour
     void Start()
     {
         m_NowLogInfo = new LogData();       // 모든 로그인 데이터가 저장될 딕셔너리 초기화?
+
+        GPGSBinder.Instance.loginState += GoogleLogin;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (network.MysData != " " && (network.MysData == "로그인 성공" || network.MysData == "로그인 실패"))
-        {
-            ServerStr = network.MysData;
-            network.MysData = " ";
-        }
+       // if (network.MysData != " " && (network.MysData == "로그인 성공" || network.MysData == "로그인 실패"))
+       // {
+       //     ServerStr = network.MysData;
+       //     network.MysData = " ";
+       // }
     }
 
     public void CheckLoginData()
@@ -140,5 +144,15 @@ public class LoginInfo : MonoBehaviour
             m_PopupNotice.gameObject.SetActive(true);
             m_PopupNotice.gameObject.GetComponent<PopOffUI>().DelayTurnOffUI();    // 팝업창 띄우기 
         }
+    }
+
+    public void GoogleLogin(bool sign)
+    {
+        if(sign == true)
+        {
+            PopUpSetAcademyNamePanel.PopUpMyUI();
+        }
+
+        
     }
 }

@@ -10,10 +10,10 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class InGameCamera : MonoBehaviour
 {
-    public float m_OrthoZoomSpeed = 0.5f;    // OrthoGraphic Mode
+    public float m_OrthoZoomSpeed = 0.01f;    // OrthoGraphic Mode
     public Camera camera;
 
-    public float MoveSpeed;
+    public float MoveSpeed = 0.3f;
     // Vector2 PrevPos = Vector2.zero;
 
     Vector2 prePos, nowPos;

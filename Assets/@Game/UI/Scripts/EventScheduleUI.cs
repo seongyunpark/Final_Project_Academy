@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class EventScheduleUI : MonoBehaviour
 {
-    public SaveEventClassData tempEventList;                                // 내가 선택한 날짜를 받기 위한 임시 변수
-    public List<SaveEventClassData> MyEventList = new List<SaveEventClassData>();       // 현재 나의 이벤트 목록
+    public SaveEventData tempEventList;                                // 내가 선택한 날짜를 받기 위한 임시 변수
+    public List<SaveEventData> MyEventList = new List<SaveEventData>();       // 현재 나의 이벤트 목록
 
     [Header("PossibleCountImg")]
     public GameObject _nowPossibleCountImg;

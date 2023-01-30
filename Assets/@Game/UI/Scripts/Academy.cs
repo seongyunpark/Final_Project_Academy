@@ -47,7 +47,7 @@ public class Academy : MonoBehaviour
             PlayerInfo.Instance.m_DirectorName = MyDirector;
 
             string strFile = Application.dataPath + "\\Json\\PlayerInfo_NewtonJson.json";
-           FileInfo fileInfo = new FileInfo(strFile);
+            FileInfo fileInfo = new FileInfo(strFile);
 
             Debug.Log(strFile);
 
@@ -68,6 +68,13 @@ public class Academy : MonoBehaviour
                 Debug.Log(PlayerInfo.Instance);
 
             }
+
+            if (GPGSBinder.Instance.UserId != null)
+            {
+                GPGSBinder.Instance.UnlockAchievement(GPGSIds.achievement_Welcome);     //구글 업적 달성
+                // 딜레이를 줘야 할까?
+            }
+
             MoveSceneManager.m_Instance.MoveToInGameScene();
         }
         else

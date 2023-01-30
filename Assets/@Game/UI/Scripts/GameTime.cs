@@ -5,51 +5,23 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 
-public enum eMonth
-{
-    January = 0,
-    February,
-    March, 
-    April,
-    May,
-    June,
-    July,
-    August,
-    September,
-    October,
-    November,
-    December
-}
-
-public enum eWeek
-{
-    Week1 = 0,
-    Week2,
-    Week3,
-    Week4
-}
-
-public enum eDate
-{
-    Monday = 0,
-    Tuesday,
-    Wednsday,
-    Thursday,
-    Friday
-}
-
 public struct NowTime
 {
     public int NowYear;
-    public string NowMonth;
-    public string NowWeek;
-    public string NowDay;
+    public int NowMonth;
+    public int NowWeek;
+    public int NowDay;
+}
+
+public class TimeDefine
+{
+    // const int 
 }
 
 /// <summary>
-///  
+///  2023. 01. 30 Mang
 /// 
-/// 시간 -> enum 클래스 로 바꿔서 UI 적으로 보일때만 한글로 보여지도록 하자
+/// 시간 : string -> int 로 변경. UI 는 보이기만 하도록
 /// </summary>
 public class GameTime : MonoBehaviour
 {
@@ -75,21 +47,12 @@ public class GameTime : MonoBehaviour
     const float LimitTime2 = 30.0f;     // 3 ~ 4주 제한시간
     float PrevTime = 0;
 
-    int Year = 1;
-    // string[] Month = new string[12];
-    // string[] Week = new string[4];
-
-    public string[] Month = { "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월" };
-    public string[] Week = { "첫째 주", "둘째 주", "셋째 주", "넷째 주" };
-
-
-    public string[] Day = { "월요일", "화요일", "수요일", "목요일", "금요일" };
+    private int Year = 1;           // 1 ~ 3년(게임모드) - 무한(무한모드)
+    private int Month = 3;          // 1 ~ 12월(12)
+    private int Week = 1;           // 1 ~ 4주(4)
+    private int Day = 1;            // 월 ~ 금(5)
 
     Image TimeBarImg;
-
-    public int MonthIndex = 2;
-    public int WeekIndex = 0;
-    public int DayIndex = 0;
 
     int FirstHalfPerSecond = 1;       //  (1주 - 2주) 하루의 시간 1초(한 주 총 5초)
     int SecondHalfPerSecond = 6;      // (3주 - 4주)하루의 시간은 6초                                       // 
@@ -110,8 +73,6 @@ public class GameTime : MonoBehaviour
         {
             instance = this;
         }
-
-
     }
 
     // Start is called before the first frame update
@@ -119,21 +80,21 @@ public class GameTime : MonoBehaviour
     {
         Debug.Log(SecondHalfPerSecond);
         // Debug.Log(TimeBarImg.fillAmount);
-        Debug.Log(Day[i]);
+        Debug.Log(Day);
 
         IsGameMode = false;
         Debug.Log(IsGameMode);
 
         // Month[11] = "12월";
         // Week[0] = "첫째주";
-        m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
+        m_DrawnowTime.text = Year + "년 " + Month + "월 " + Week + "주";
 
         FlowTime.NowYear = Year;
-        FlowTime.NowMonth = Month[MonthIndex];
-        FlowTime.NowWeek = Week[WeekIndex];
-        FlowTime.NowDay = Day[DayIndex];
+        FlowTime.NowMonth = Month;
+        FlowTime.NowWeek = Week;
+        FlowTime.NowDay = Day;
 
-        Debug.Log(Year + "년" + " " + Month[MonthIndex] + " " + Week[WeekIndex]);
+        Debug.Log(Year + "년" + " " + Month + " " + Week);
 
         ShowGameTime();
     }
@@ -162,31 +123,35 @@ public class GameTime : MonoBehaviour
 
     public void FlowtheTime()
     {
+        m_DrawnowTime.text = Year + "년 " + Month + "월 " + Week + "주";
+
+        CheckPerSecond();
+
         // 30초 넘어갔을 때 값 변화
         if (isChangeWeek)     // 
         {
+            ChangeMonth();
+
             ChangeWeek();
 
             Debug.Log("Time.time : " + Time.time);
 
             // nowTime = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
-            m_DrawnowTime.text = Year + "년 " + Month[MonthIndex] + " " + Week[WeekIndex];
+            if (Week != 4)
+            {
+                m_DrawnowTime.text = Year + "년 " + Month + "월 " + Week + "주";
+
+                FlowTime.NowWeek = Week;
+            }
 
             FlowTime.NowYear = Year;
-            FlowTime.NowMonth = Month[MonthIndex];
-            FlowTime.NowWeek = Week[WeekIndex];
-
-            // m_DrawnowTime.text = nowTime;
-
+            FlowTime.NowMonth = Month;
 
             // 3년이라는 게임 시간이 끝나고 난 후
-            if (Year == 3 && MonthIndex == 11 && WeekIndex == 3)
+            if (Year == 3 && Month == 12 && Week == 4)
             {
                 IsLimitedGameTimeEnd();
             }
-
-            ChangeYear();
-            ChangeMonth();
 
             PrevTime = 0.0f;
             isChangeWeek = false;
@@ -196,19 +161,19 @@ public class GameTime : MonoBehaviour
         {
             PrevTime = Time.time;
         }
-
-        CheckPerSecond();
     }
 
     public void ChangeDay()
     {
-        if (DayIndex != 4)
+        if (Day < 5)
         {
-            DayIndex++;
+            Day++;
+
+            Debug.Log("요일 : " + Day);
         }
-        else if (DayIndex == 4)
+        else if (Day >= 5)
         {
-            DayIndex = 0;
+            Day = 1;
         }
     }
 
@@ -216,38 +181,33 @@ public class GameTime : MonoBehaviour
     public void ChangeWeek()
     {
         // Week 증가
-        if (WeekIndex != 3)
+        if (Week < 4)
         {
-            WeekIndex++;
+            Week++;
+
+            Debug.Log("주 : " + Week);
         }
-        else if (WeekIndex == 3)
+        else if (Week >= 4)
         {
-            WeekIndex = 0;
+            Week = 1;
         }
     }
 
-    // 월 증가
+    // 년, 월 증가
     public void ChangeMonth()
     {
         // 연도 변경 시 월 초기화
-        if (MonthIndex == 11 && WeekIndex == 3)
+        if (Month >= 12 && Week >= 4)
         {
-            MonthIndex = 0;
+            Month = 1;
+
+            Year++;
         }
         // 월 증가
-        else if (MonthIndex != 11 && WeekIndex == 3)
+        else if (Month < 12 && Week >= 4)
         {
-            MonthIndex++;
-        }
-    }
-
-    // 년 증가
-    public void ChangeYear()
-    {
-        // Year 증가
-        if (MonthIndex == 11 && WeekIndex == 3)
-        {
-            Year++;
+            Month++;
+            Debug.Log("달 : " + Month);
         }
     }
 
@@ -263,7 +223,7 @@ public class GameTime : MonoBehaviour
         // 수업시작 후 반에 도착할 때 까지는 시간이 흐르면 안된다. TimeScale을 멈추면 캐릭터가 움직이지 않으니 다른 방법으로,,
         if (GameTime.Instance.IsGameMode == true && InGameTest.Instance.m_ClassState != ClassState.ClassStart)
         {
-            if (Week[WeekIndex] == "첫째 주" || Week[WeekIndex] == "둘째 주")
+            if (Week == 1 || Week == 2 || Week == 3 || Week == 4)
             {
                 // (1 ~ 2 주차)1초마다 시간체크
                 if (Time.time - PrevTime >= FirstHalfPerSecond)
@@ -272,7 +232,7 @@ public class GameTime : MonoBehaviour
 
                     // 1초마다 더해주기
                     ChangeDay();
-                    FlowTime.NowDay = Day[DayIndex];
+                    FlowTime.NowDay = Day;
 
                     i += 1;
                     FirstHalfPerSecond += 1;
@@ -291,41 +251,41 @@ public class GameTime : MonoBehaviour
                     }
                     Debug.Log("초 : " + FirstHalfPerSecond);
                     Debug.Log("이미지 : " + TimeBarImg.fillAmount);
-                    Debug.Log("데이 : " + Week[WeekIndex]);
+                    Debug.Log("데이 : " + Week);
                 }
             }
-            else if (Week[WeekIndex] == "셋째 주" || Week[WeekIndex] == "넷째 주")
-            {
-                // (3 ~ 4 주차)6초마다 시간체크
-                if (Time.time - PrevTime >= SecondHalfPerSecond)
-                {
-                    TimeBarImg.fillAmount += 0.2f;
-
-                    i += 1;
-                    // 6초마다 더해주기
-                    ChangeDay();
-                    FlowTime.NowDay = Day[DayIndex];
-
-                    SecondHalfPerSecond += 6;
-
-                    if (SecondHalfPerSecond > LimitTime2)
-                    {
-                        TimeBarImg.fillAmount = 0.2f;
-
-                        SecondHalfPerSecond = 6;
-
-                        i = 0;
-
-                        Debug.Log(SecondHalfPerSecond + "초 체크 초기화");
-
-                        isChangeWeek = true;
-                    }
-
-                    Debug.Log(SecondHalfPerSecond);
-                    Debug.Log(TimeBarImg.fillAmount);
-                    Debug.Log(Day[i]);
-                }
-            }
+            //else if (Week == 3 || Week == 4)
+            //{
+            //    // (3 ~ 4 주차)6초마다 시간체크
+            //    if (Time.time - PrevTime >= SecondHalfPerSecond)
+            //    {
+            //        TimeBarImg.fillAmount += 0.2f;
+            //
+            //        i += 1;
+            //        // 6초마다 더해주기
+            //        ChangeDay();
+            //        FlowTime.NowDay = Day[DayIndex];
+            //
+            //        SecondHalfPerSecond += 6;
+            //
+            //        if (SecondHalfPerSecond > LimitTime2)
+            //        {
+            //            TimeBarImg.fillAmount = 0.2f;
+            //
+            //            SecondHalfPerSecond = 6;
+            //
+            //            i = 0;
+            //
+            //            Debug.Log(SecondHalfPerSecond + "초 체크 초기화");
+            //
+            //            isChangeWeek = true;
+            //        }
+            //
+            //        Debug.Log(SecondHalfPerSecond);
+            //        Debug.Log(TimeBarImg.fillAmount);
+            //        Debug.Log(Day[i]);
+            //    }
+            //}
         }
     }
 
